@@ -37,7 +37,7 @@ const Canvas: FunctionComponent<Props> = ({draw}) => {
     return () => {
       window.cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [draw]);
 
   return (
     <canvas ref={canvasRef} width="700" height="500" id="canvas-grid"></canvas>
