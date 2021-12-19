@@ -4,7 +4,6 @@ import { FunctionComponent, useEffect, useRef } from "react";
  * Source: https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258
  */
 
-
 interface Props {
   draw: (ctx: CanvasRenderingContext2D, frameCount: number) => void
 }
@@ -40,7 +39,7 @@ const Canvas: FunctionComponent<Props> = ({draw}) => {
   }, [draw]);
 
   return (
-    <canvas ref={canvasRef} width="700" height="500" id="canvas-grid"></canvas>
+    <canvas ref={canvasRef} width="800" height="500"></canvas>
   );
 };
 

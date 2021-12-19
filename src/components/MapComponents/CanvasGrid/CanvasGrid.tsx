@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 import Canvas from "../Canvas/Canvas";
 
 const CanvasGrid: FunctionComponent = () => {
-  const HEXAGON_ANGLE = (2 * Math.PI) / 6;
+  const HEXAGON_ANGLE = 2 * Math.PI / 6;
   const HEXAGON_RADIUS = 50;
 
   const drawHexagon: (
@@ -26,6 +26,7 @@ const CanvasGrid: FunctionComponent = () => {
     width: number,
     height: number
   ) => void = (ctx, width, height) => {
+    ctx.clearRect(0, 0, width, height)
     for (
       let y = HEXAGON_RADIUS;
       y + HEXAGON_RADIUS * Math.sin(HEXAGON_ANGLE) < height;
@@ -45,7 +46,7 @@ const CanvasGrid: FunctionComponent = () => {
   const draw: (ctx: CanvasRenderingContext2D, frameCount: number) => void = (
     ctx
   ) => {
-    return drawGrid.call(null, ctx, 700, 500);
+    return drawGrid.call(null, ctx, 800, 500);
   };
 
   return <Canvas draw={draw} />;
