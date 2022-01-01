@@ -11,7 +11,7 @@ export const Page: FunctionComponent = () => {
         <Sidebar />
       </aside>
       <main className={styles.main}>
-        <CanvasGrid />
+        <CanvasGrid width={800} height={500} />
       </main>
       <footer className={styles.footer}></footer>
     </div>

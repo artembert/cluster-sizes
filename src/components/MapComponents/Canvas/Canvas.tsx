@@ -6,15 +6,11 @@ import { FunctionComponent, useEffect, useRef } from "react";
 
 interface Props {
   draw: (ctx: CanvasRenderingContext2D, frameCount: number) => void;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
 }
 
-const Canvas: FunctionComponent<Props> = ({
-  draw,
-  width = 800,
-  height = 500,
-}) => {
+const Canvas: FunctionComponent<Props> = ({ draw, width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     let frameCount = 0;
