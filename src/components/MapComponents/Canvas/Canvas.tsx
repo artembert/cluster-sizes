@@ -46,7 +46,7 @@ const Canvas: FunctionComponent<Props> = ({
     return () => {
       window.cancelAnimationFrame(animationFrameId);
     };
-  }, [draw]);
+  }, [draw, width, height]);
 
   return <canvas ref={canvasRef}></canvas>;
 };
