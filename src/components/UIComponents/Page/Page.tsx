@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import { FunctionComponent } from "react";
 import CanvasGrid from "../../MapComponents/CanvasGrid/CanvasGrid";
 import Sidebar from "../Sidebar/Sidebar";
 import styles from "./Page.module.css";
