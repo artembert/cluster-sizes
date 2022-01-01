@@ -49,7 +49,7 @@ const CanvasGrid: FunctionComponent = () => {
     return drawGrid.call(null, ctx, 800, 500);
   };
 
-  return <Canvas draw={draw} />;
+  return <Canvas draw={draw} width={800} height={500} />;
 };
 
 export default CanvasGrid;

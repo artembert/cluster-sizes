@@ -5,12 +5,16 @@ import { FunctionComponent, useEffect, useRef } from "react";
  */
 
 interface Props {
-  draw: (ctx: CanvasRenderingContext2D, frameCount: number) => void
+  draw: (ctx: CanvasRenderingContext2D, frameCount: number) => void;
+  width?: number;
+  height?: number;
 }
 
-const Canvas: FunctionComponent<Props> = ({draw}) => {
-  
-
+const Canvas: FunctionComponent<Props> = ({
+  draw,
+  width = 800,
+  height = 500,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     let frameCount = 0;
@@ -25,6 +29,12 @@ const Canvas: FunctionComponent<Props> = ({draw}) => {
       return;
     }
     const ctx = probablyCtx;
+    const { devicePixelRatio: ratio = 1 } = window;
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    ctx.scale(ratio, ratio);
 
     const rednerCanvas = () => {
       frameCount++;
@@ -38,9 +48,7 @@ const Canvas: FunctionComponent<Props> = ({draw}) => {
     };
   }, [draw]);
 
-  return (
-    <canvas ref={canvasRef} width="800" height="500"></canvas>
-  );
+  return <canvas ref={canvasRef}></canvas>;
 };
 
 export default Canvas;
