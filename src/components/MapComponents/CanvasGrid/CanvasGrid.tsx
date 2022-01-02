@@ -1,4 +1,5 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useContext } from "react";
+import { GridSellSizeContext } from "../../../contexts/GridCellSizeContext";
 import Canvas from "../Canvas/Canvas";
 
 interface Props {
@@ -6,10 +7,10 @@ interface Props {
   height: number;
 }
 
-const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
-  const HEXAGON_ANGLE = (2 * Math.PI) / 6;
-  const HEXAGON_RADIUS = 50;
+const HEXAGON_ANGLE = (2 * Math.PI) / 6;
 
+const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
+  const { value: hexagonRadius } = useContext(GridSellSizeContext);
   const drawHexagon: (
     ctx: CanvasRenderingContext2D,
     x: number,
@@ -18,8 +19,8 @@ const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
     ctx.beginPath();
     for (var i = 0; i < 6; i++) {
       ctx.lineTo(
-        x + HEXAGON_RADIUS * Math.cos(HEXAGON_ANGLE * i),
-        y + HEXAGON_RADIUS * Math.sin(HEXAGON_ANGLE * i)
+        x + hexagonRadius * Math.cos(HEXAGON_ANGLE * i),
+        y + hexagonRadius * Math.sin(HEXAGON_ANGLE * i)
       );
     }
     ctx.closePath();
@@ -33,15 +34,15 @@ const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
   ) => void = (ctx, width, height) => {
     ctx.clearRect(0, 0, width, height);
     for (
-      let y = HEXAGON_RADIUS;
-      y + HEXAGON_RADIUS * Math.sin(HEXAGON_ANGLE) < height;
-      y += HEXAGON_RADIUS * Math.sin(HEXAGON_ANGLE)
+      let y = hexagonRadius;
+      y + hexagonRadius * Math.sin(HEXAGON_ANGLE) < height;
+      y += hexagonRadius * Math.sin(HEXAGON_ANGLE)
     ) {
       for (
-        let x = HEXAGON_RADIUS, j = 0;
-        x + HEXAGON_RADIUS * (1 + Math.cos(HEXAGON_ANGLE)) < width;
-        x += HEXAGON_RADIUS * (1 + Math.cos(HEXAGON_ANGLE)),
-          y += (-1) ** j++ * HEXAGON_RADIUS * Math.sin(HEXAGON_ANGLE)
+        let x = hexagonRadius, j = 0;
+        x + hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE)) < width;
+        x += hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE)),
+          y += (-1) ** j++ * hexagonRadius * Math.sin(HEXAGON_ANGLE)
       ) {
         drawHexagon(ctx, x, y);
       }

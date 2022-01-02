@@ -1,12 +1,46 @@
-import { FunctionComponent } from "react";
+import { ChangeEvent, FunctionComponent } from "react";
+import {
+  ActionKind,
+  useGridSellSize,
+  useGridSellSizeDispatch,
+} from "../../../contexts/GridCellSizeContext";
 import styles from "./Sidebar.module.css";
 
 const Sidebar: FunctionComponent = () => {
+  const dispatchGridCellSize = useGridSellSizeDispatch();
+  const { value: initialCellSize } = useGridSellSize();
+
+  function handleCellSizeChange(e: ChangeEvent<HTMLInputElement>) {
+    dispatchGridCellSize({
+      type: ActionKind.Change,
+      payload: e.target.valueAsNumber,
+    });
+  }
+
   return (
     <div className={styles.layout}>
-      <div>zoomLevel: 9</div>
-      <div>cell-radius: 15px</div>
-      <div>marker-radius: 15px;</div>
+      <table>
+        <tbody>
+          <tr>
+            <td>zoom-level</td>
+            <td>9</td>
+          </tr>
+          <tr>
+            <td>cell-size</td>
+            <td>
+              <input
+                value={initialCellSize}
+                type="number"
+                onChange={handleCellSizeChange}
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>marker-radius</td>
+            <td>15 px</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
