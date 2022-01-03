@@ -15,7 +15,7 @@ const getYStartCoordsForAllLines: (
 ) => number[] = (height, hexagonRadius) => {
   const yStartCoords = [];
   let y = hexagonRadius * Math.sin(HEXAGON_ANGLE);
-  while (y < height) {
+  while (y + 2 * hexagonRadius * Math.sin(HEXAGON_ANGLE) < height) {
     yStartCoords.push(y);
     y += 2 * hexagonRadius * Math.sin(HEXAGON_ANGLE);
   }
