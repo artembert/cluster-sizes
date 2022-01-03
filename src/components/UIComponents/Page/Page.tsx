@@ -13,7 +13,7 @@ export const Page: FunctionComponent = () => {
           <Sidebar />
         </aside>
         <main className={styles.main}>
-          <CanvasGrid width={800} height={500} />
+          <CanvasGrid width={650} height={650} />
         </main>
         <footer className={styles.footer}></footer>
       </div>

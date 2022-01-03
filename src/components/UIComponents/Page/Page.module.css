@@ -1,31 +1,32 @@
 .container {
-    display: grid;
-    grid-template-areas:
-        "header header"
-        "sidebar main"
-        "footer footer";
-    height: 100vh;
-    grid-template-rows: min-content 1fr min-content;
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+  height: 100vh;
+  grid-template-rows: min-content 1fr min-content;
+  grid-template-columns: max-content 1fr;
 }
 
 .header {
-    grid-area: header;
-    min-height: 32px;
-    background-color: gainsboro;
+  grid-area: header;
+  min-height: 32px;
+  background-color: gainsboro;
 }
 
 .sidebar {
-    grid-area: sidebar;
-    background-color: ghostwhite;
-    width: max-content;
+  grid-area: sidebar;
+  background-color: ghostwhite;
+  width: max-content;
 }
 
 .main {
-    grid-area: main;
+  grid-area: main;
 }
 
 .footer {
-    grid-area: footer;
-    min-height: 32px;
-    background-color: gainsboro;
+  grid-area: footer;
+  min-height: 32px;
+  background-color: gainsboro;
 }
