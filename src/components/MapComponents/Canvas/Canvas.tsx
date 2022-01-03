@@ -5,7 +5,7 @@ import { FunctionComponent, useEffect, useRef } from "react";
  */
 
 interface Props {
-  draw: (ctx: CanvasRenderingContext2D, frameCount: number) => void;
+  draw: (ctx: CanvasRenderingContext2D) => void;
   width: number;
   height: number;
 }
@@ -13,9 +13,6 @@ interface Props {
 const Canvas: FunctionComponent<Props> = ({ draw, width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    let frameCount = 0;
-    let animationFrameId: number;
-
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
@@ -32,16 +29,7 @@ const Canvas: FunctionComponent<Props> = ({ draw, width, height }) => {
     canvas.style.height = height + "px";
     ctx.scale(ratio, ratio);
 
-    const rednerCanvas = () => {
-      frameCount++;
-      draw(ctx, frameCount);
-      animationFrameId = window.requestAnimationFrame(rednerCanvas);
-    };
-    rednerCanvas();
-
-    return () => {
-      window.cancelAnimationFrame(animationFrameId);
-    };
+    draw(ctx);
   }, [draw, width, height]);
 
   return <canvas ref={canvasRef}></canvas>;
