@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import { useGridSellSize } from "../../../contexts/GridCellSizeContext";
 import Canvas from "../Canvas/Canvas";
+import { drawPieChart } from "../PieChart/PieChart";
 
 /**
  * Image: https://eperezcosano.github.io/hex-grid/
@@ -41,6 +42,16 @@ function drawHexagon(
   }
   ctx.closePath();
   ctx.stroke();
+  drawPieChart(
+    ctx,
+    [
+      { value: 1, label: "1", color: "#f06292" },
+      { value: 1, label: "2", color: "#4db6ac" },
+      { value: 1, label: "3", color: "#ffb74d" },
+    ],
+    x,
+    y
+  );
 }
 
 function drawGrid(

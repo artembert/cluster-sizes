@@ -20,7 +20,7 @@ export type Action = {
 };
 
 const initialCellSize: State = {
-  value: 50,
+  value: 100,
 };
 
 export const GridSellSizeContext = createContext(initialCellSize);
