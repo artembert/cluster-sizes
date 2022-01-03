@@ -1,5 +1,5 @@
-import { FunctionComponent, useContext } from "react";
-import { GridSellSizeContext } from "../../../contexts/GridCellSizeContext";
+import { FunctionComponent } from "react";
+import { useGridSellSize } from "../../../contexts/GridCellSizeContext";
 import Canvas from "../Canvas/Canvas";
 
 interface Props {
@@ -10,7 +10,8 @@ interface Props {
 const HEXAGON_ANGLE = (2 * Math.PI) / 6;
 
 const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
-  const { value: hexagonRadius } = useContext(GridSellSizeContext);
+  const { value: gridSellSize } = useGridSellSize();
+  const hexagonRadius = gridSellSize / 2;
   const drawHexagon: (
     ctx: CanvasRenderingContext2D,
     x: number,
@@ -33,11 +34,8 @@ const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
     height: number
   ) => void = (ctx, width, height) => {
     ctx.clearRect(0, 0, width, height);
-    for (
       let y = hexagonRadius;
-      y + hexagonRadius * Math.sin(HEXAGON_ANGLE) < height;
-      y += hexagonRadius * Math.sin(HEXAGON_ANGLE)
-    ) {
+    while (y + hexagonRadius * Math.sin(HEXAGON_ANGLE) < height) {
       for (
         let x = hexagonRadius, j = 0;
         x + hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE)) < width;
@@ -46,6 +44,7 @@ const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
       ) {
         drawHexagon(ctx, x, y);
       }
+      y += hexagonRadius * Math.sin(HEXAGON_ANGLE);
     }
   };
 
