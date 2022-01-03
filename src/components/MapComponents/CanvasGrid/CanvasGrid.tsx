@@ -76,11 +76,19 @@ function getRandomMarkerSize(max: number): number {
 }
 
 function getPieChartContent(): PieChartItem[] {
-  return [
+  const colors = [
     { value: 1, label: "1", color: "#f06292" },
     { value: 1, label: "2", color: "#4db6ac" },
     { value: 1, label: "3", color: "#ffb74d" },
-  ].map((item) => ({ ...item, value: Math.random() }));
+    { value: 1, label: "3", color: "#ff8a65" },
+    { value: 1, label: "3", color: "#aed581" },
+    { value: 1, label: "3", color: "#4dd0e1" },
+    { value: 1, label: "3", color: "#7986cb" },
+    { value: 1, label: "3", color: "#e57373" },
+  ]
+    .sort((a, b) => (Math.random() > 0.5 ? 1 : -1))
+    .map((item) => ({ ...item, value: Math.random() }));
+  return colors.slice(0, Math.random() * colors.length);
 }
 
 const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
