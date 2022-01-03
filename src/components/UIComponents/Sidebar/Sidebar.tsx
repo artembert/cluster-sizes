@@ -8,7 +8,7 @@ import styles from "./Sidebar.module.css";
 
 const Sidebar: FunctionComponent = () => {
   const dispatchGridCellSize = useGridSellSizeDispatch();
-  const { value: initialCellSize } = useGridSellSize();
+  const { cellOuterRadius } = useGridSellSize();
 
   function handleCellSizeChange(e: ChangeEvent<HTMLInputElement>) {
     dispatchGridCellSize({
@@ -29,7 +29,7 @@ const Sidebar: FunctionComponent = () => {
             <td>cell-size</td>
             <td>
               <input
-                value={initialCellSize}
+                value={cellOuterRadius}
                 type="number"
                 onChange={handleCellSizeChange}
               />

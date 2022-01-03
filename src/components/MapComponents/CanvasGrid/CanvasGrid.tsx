@@ -1,7 +1,10 @@
 import { FunctionComponent } from "react";
-import { useGridSellSize } from "../../../contexts/GridCellSizeContext";
+import {
+  MIN_CELL_RADIUS,
+  useGridSellSize,
+} from "../../../contexts/GridCellSizeContext";
 import Canvas from "../Canvas/Canvas";
-import { drawPieChart } from "../PieChart/PieChart";
+import { drawPieChart, PieChartItem } from "../PieChart/PieChart";
 
 /**
  * Image: https://eperezcosano.github.io/hex-grid/
@@ -31,7 +34,8 @@ function drawHexagon(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
-  hexagonRadius: number
+  hexagonRadius: number,
+  cellInnerRadius: number
 ): void {
   ctx.beginPath();
   for (var i = 0; i < 6; i++) {
@@ -42,23 +46,15 @@ function drawHexagon(
   }
   ctx.closePath();
   ctx.stroke();
-  drawPieChart(
-    ctx,
-    [
-      { value: 1, label: "1", color: "#f06292" },
-      { value: 1, label: "2", color: "#4db6ac" },
-      { value: 1, label: "3", color: "#ffb74d" },
-    ],
-    x,
-    y
-  );
+  drawPieChart(ctx, getPieChartContent(), x, y, cellInnerRadius);
 }
 
 function drawGrid(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  hexagonRadius: number
+  hexagonRadius: number,
+  cellInnerRadius: number
 ): void {
   ctx.clearRect(0, 0, width, height);
   const yStartCoords = getYStartCoordsForAllLines(height, hexagonRadius);
@@ -66,7 +62,8 @@ function drawGrid(
     let x = hexagonRadius;
     let j = 0;
     while (x + hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE)) < width) {
-      drawHexagon(ctx, x, y, hexagonRadius);
+      const markerRadius = getRandomMarkerSize(cellInnerRadius);
+      drawHexagon(ctx, x, y, hexagonRadius, markerRadius);
       x += hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE));
       y += (-1) ** j * hexagonRadius * Math.sin(HEXAGON_ANGLE);
       j++;
@@ -74,12 +71,30 @@ function drawGrid(
   });
 }
 
+function getRandomMarkerSize(max: number): number {
+  return Math.max(Math.random() * max, MIN_CELL_RADIUS);
+}
+
+function getPieChartContent(): PieChartItem[] {
+  return [
+    { value: 1, label: "1", color: "#f06292" },
+    { value: 1, label: "2", color: "#4db6ac" },
+    { value: 1, label: "3", color: "#ffb74d" },
+  ].map((item) => ({ ...item, value: Math.random() }));
+}
+
 const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
-  const { value: gridSellSize } = useGridSellSize();
-  const hexagonRadius = gridSellSize / 2;
+  const { cellOuterRadius, cellInnerRadius } = useGridSellSize();
 
   function draw(ctx: CanvasRenderingContext2D): void {
-    return drawGrid.call(null, ctx, width, height, hexagonRadius);
+    return drawGrid.call(
+      null,
+      ctx,
+      width,
+      height,
+      cellOuterRadius,
+      cellInnerRadius
+    );
   }
 
   return <Canvas draw={draw} width={width} height={height} />;

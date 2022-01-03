@@ -5,7 +5,7 @@ export interface PieChartItem {
 }
 
 const pieChartSizes = {
-  diameter: 20,
+  radius: 20,
   borderWidth: 4,
 };
 
@@ -57,10 +57,10 @@ function clipCenterCircle(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
-  markerWidth: number,
+  markerRadius: number,
   borderWidth: number = pieChartSizes.borderWidth
 ): void {
-  if (borderWidth > markerWidth / 2) {
+  if (borderWidth > markerRadius) {
     console.error("Border should be smaller then marker radius");
   }
   /// save context for clipping
@@ -68,7 +68,7 @@ function clipCenterCircle(
 
   /// create path
   ctx.beginPath();
-  ctx.arc(x, y, markerWidth / 2 - borderWidth, 0, 2 * Math.PI);
+  ctx.arc(x, y, markerRadius - borderWidth, 0, 2 * Math.PI);
   ctx.closePath();
 
   /// set clipping mask based on shape
@@ -86,10 +86,9 @@ export function drawPieChart(
   data: PieChartItem[],
   x: number,
   y: number,
-  size: number = pieChartSizes.diameter
+  radius: number = pieChartSizes.radius
 ) {
   const total = getTotal(data);
-  const radius = size / 2;
 
   let startAngle, endAngle;
 
@@ -104,5 +103,5 @@ export function drawPieChart(
     ctx.fill();
     ctx.closePath();
   }
-  clipCenterCircle(ctx, x, y, size);
+  clipCenterCircle(ctx, x, y, radius);
 }

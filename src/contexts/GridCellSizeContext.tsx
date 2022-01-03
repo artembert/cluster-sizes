@@ -6,8 +6,12 @@ import {
   useReducer,
 } from "react";
 
+const INITIAL_CELL_OUTER_RADIUS = 50;
+export const MIN_CELL_RADIUS = 5;
+
 export type State = {
-  value: number;
+  cellOuterRadius: number;
+  cellInnerRadius: number;
 };
 
 export const enum ActionKind {
@@ -20,7 +24,8 @@ export type Action = {
 };
 
 const initialCellSize: State = {
-  value: 100,
+  cellOuterRadius: INITIAL_CELL_OUTER_RADIUS,
+  cellInnerRadius: getHexagonInnerCirclieRadius(INITIAL_CELL_OUTER_RADIUS),
 };
 
 export const GridSellSizeContext = createContext(initialCellSize);
@@ -44,7 +49,8 @@ function tasksReducer(cellSize: State, action: Action): State {
   switch (action.type) {
     case ActionKind.Change: {
       return {
-        value: action.payload,
+        cellOuterRadius: action.payload,
+        cellInnerRadius: getHexagonInnerCirclieRadius(action.payload),
       };
     }
     default: {
@@ -59,4 +65,8 @@ export function useGridSellSize() {
 
 export function useGridSellSizeDispatch() {
   return useContext(GridSellDispatchContext);
+}
+
+function getHexagonInnerCirclieRadius(hexagonRadius: number): number {
+  return (Math.sqrt(3) * hexagonRadius) / 2;
 }
