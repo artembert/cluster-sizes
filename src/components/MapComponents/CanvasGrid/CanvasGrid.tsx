@@ -36,14 +36,15 @@ const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
     ctx.clearRect(0, 0, width, height);
       let y = hexagonRadius;
     while (y + hexagonRadius * Math.sin(HEXAGON_ANGLE) < height) {
-      for (
-        let x = hexagonRadius, j = 0;
-        x + hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE)) < width;
-        x += hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE)),
-          y += (-1) ** j++ * hexagonRadius * Math.sin(HEXAGON_ANGLE)
-      ) {
+      let x = hexagonRadius;
+      let j = 0;
+      while (x + hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE)) < width) {
         drawHexagon(ctx, x, y);
+        x += hexagonRadius * (1 + Math.cos(HEXAGON_ANGLE));
+        y += (-1) ** j * hexagonRadius * Math.sin(HEXAGON_ANGLE);
+        j++;
       }
+
       y += hexagonRadius * Math.sin(HEXAGON_ANGLE);
     }
   };
