@@ -8,7 +8,7 @@ import styles from "./Sidebar.module.css";
 
 const Sidebar: FunctionComponent = () => {
   const dispatchGridCellSize = useGridSellSizeDispatch();
-  const { cellOuterRadius, cellInnerRadius } = useGridSellSize();
+  const { cellOuterRadius, cellInnerRadius, zoomLevel } = useGridSellSize();
 
   function handleCellSizeChange(e: ChangeEvent<HTMLInputElement>) {
     dispatchGridCellSize({
@@ -23,7 +23,9 @@ const Sidebar: FunctionComponent = () => {
         <tbody>
           <tr>
             <td>zoom-level</td>
-            <td>9</td>
+            <td>
+              <input value={zoomLevel.toFixed(2)} type="number" disabled />
+            </td>
           </tr>
           <tr>
             <td>cell-size</td>

@@ -8,14 +8,17 @@ import {
 
 const INITIAL_CELL_OUTER_RADIUS = 50;
 export const MIN_CELL_RADIUS = 5;
+const INITIAL_ZOOM_LEVEL = 5;
 
 export type State = {
   cellOuterRadius: number;
   cellInnerRadius: number;
+  zoomLevel: number;
 };
 
 export const enum ActionKind {
   Change = "CHANGE",
+  ZoomChange = "ZOOM_CHANGE",
 }
 
 export type Action = {
@@ -26,6 +29,7 @@ export type Action = {
 const initialCellSize: State = {
   cellOuterRadius: INITIAL_CELL_OUTER_RADIUS,
   cellInnerRadius: getHexagonInnerCirclieRadius(INITIAL_CELL_OUTER_RADIUS),
+  zoomLevel: INITIAL_ZOOM_LEVEL,
 };
 
 export const GridSellSizeContext = createContext(initialCellSize);
@@ -45,16 +49,23 @@ export const GridSellSizeProvider: FunctionComponent = ({ children }) => {
   );
 };
 
-function tasksReducer(cellSize: State, action: Action): State {
-  switch (action.type) {
+function tasksReducer(prevState: State, { type, payload }: Action): State {
+  switch (type) {
     case ActionKind.Change: {
       return {
-        cellOuterRadius: action.payload,
-        cellInnerRadius: getHexagonInnerCirclieRadius(action.payload),
+        ...prevState,
+        cellOuterRadius: payload,
+        cellInnerRadius: getHexagonInnerCirclieRadius(payload),
+      };
+    }
+    case ActionKind.ZoomChange: {
+      return {
+        ...prevState,
+        zoomLevel: payload,
       };
     }
     default: {
-      throw Error("Unknown action: " + action.type);
+      throw Error("Unknown action: " + type);
     }
   }
 }
