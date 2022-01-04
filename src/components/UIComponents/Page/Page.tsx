@@ -1,6 +1,7 @@
 import { FunctionComponent } from "react";
 import { GridSellSizeProvider } from "../../../contexts/GridCellSizeContext";
 import CanvasGrid from "../../MapComponents/CanvasGrid/CanvasGrid";
+import Map from "../../MapComponents/Map/Map";
 import Sidebar from "../Sidebar/Sidebar";
 import styles from "./Page.module.css";
 
@@ -13,7 +14,10 @@ export const Page: FunctionComponent = () => {
           <Sidebar />
         </aside>
         <main className={styles.main}>
-          <CanvasGrid width={650} height={650} />
+          <Map />
+          <div className={styles.gridContainer}>
+            <CanvasGrid width={650} height={650} />
+          </div>
         </main>
         <footer className={styles.footer}></footer>
       </div>

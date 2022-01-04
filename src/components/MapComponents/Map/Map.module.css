@@ -1,0 +1,11 @@
+.mapContainer {
+  width: 650px;
+  height: 650px;
+  position: relative;
+}
+
+.map {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}

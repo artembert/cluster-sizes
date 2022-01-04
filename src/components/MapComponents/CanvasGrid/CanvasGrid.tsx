@@ -39,6 +39,7 @@ function drawHexagon(
 ): void {
   ctx.beginPath();
   for (var i = 0; i < 6; i++) {
+    ctx.strokeStyle = "#cccccc";
     ctx.lineTo(
       x + hexagonRadius * Math.cos(HEXAGON_ANGLE * i),
       y + hexagonRadius * Math.sin(HEXAGON_ANGLE * i)

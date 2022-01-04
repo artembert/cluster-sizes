@@ -8,7 +8,7 @@ import styles from "./Sidebar.module.css";
 
 const Sidebar: FunctionComponent = () => {
   const dispatchGridCellSize = useGridSellSizeDispatch();
-  const { cellOuterRadius } = useGridSellSize();
+  const { cellOuterRadius, cellInnerRadius } = useGridSellSize();
 
   function handleCellSizeChange(e: ChangeEvent<HTMLInputElement>) {
     dispatchGridCellSize({
@@ -33,11 +33,19 @@ const Sidebar: FunctionComponent = () => {
                 type="number"
                 onChange={handleCellSizeChange}
               />
+              px
             </td>
           </tr>
           <tr>
             <td>marker-radius</td>
-            <td>15 px</td>
+            <td>
+              <input
+                value={cellInnerRadius.toFixed(1)}
+                type="number"
+                disabled
+              />
+              px
+            </td>
           </tr>
         </tbody>
       </table>

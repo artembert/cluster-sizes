@@ -23,10 +23,20 @@
 
 .main {
   grid-area: main;
+  position: relative;
 }
 
 .footer {
   grid-area: footer;
   min-height: 32px;
   background-color: gainsboro;
+}
+
+.gridContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 650px;
+  height: 650px;
+  pointer-events: none;
 }
