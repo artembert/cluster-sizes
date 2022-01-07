@@ -1,6 +1,7 @@
 import { ChangeEvent, FunctionComponent } from "react";
 import {
   ActionKind,
+  MIN_CELL_RADIUS,
   useGridSellSize,
   useGridSellSizeDispatch,
 } from "../../../contexts/GridCellSizeContext";
@@ -33,6 +34,7 @@ const Sidebar: FunctionComponent = () => {
               <input
                 value={cellOuterRadius}
                 type="number"
+                min={MIN_CELL_RADIUS}
                 onChange={handleCellSizeChange}
               />
               px
