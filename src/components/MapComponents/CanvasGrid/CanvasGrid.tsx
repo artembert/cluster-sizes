@@ -87,7 +87,7 @@ function getPieChartContent(): PieChartItem[] {
     { value: 1, label: "3", color: "#7986cb" },
     { value: 1, label: "3", color: "#e57373" },
   ]
-    .sort((a, b) => (Math.random() > 0.5 ? 1 : -1))
+    .sort(() => (Math.random() > 0.5 ? 1 : -1))
     .map((item) => ({ ...item, value: Math.random() }));
   return colors.slice(0, Math.random() * colors.length);
 }
