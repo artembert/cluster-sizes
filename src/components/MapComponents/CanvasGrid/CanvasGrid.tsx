@@ -6,6 +6,8 @@ import {
 import Canvas from "../Canvas/Canvas";
 import { drawPieChart, PieChartItem } from "../PieChart/PieChart";
 
+const GRID_CELL_BORDER_COLOR = "#888888";
+
 /**
  * Image: https://eperezcosano.github.io/hex-grid/
  */
@@ -39,7 +41,7 @@ function drawHexagon(
 ): void {
   ctx.beginPath();
   for (var i = 0; i < 6; i++) {
-    ctx.strokeStyle = "#cccccc";
+    ctx.strokeStyle = GRID_CELL_BORDER_COLOR;
     ctx.lineTo(
       x + hexagonRadius * Math.cos(HEXAGON_ANGLE * i),
       y + hexagonRadius * Math.sin(HEXAGON_ANGLE * i)
