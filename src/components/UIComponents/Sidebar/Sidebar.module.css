@@ -1,4 +1,9 @@
 .layout {
-    display: grid;
-    grid-gap: 8px;
+  display: grid;
+  grid-gap: 8px;
+}
+
+.input {
+  width: 80px;
+  text-align: right;
 }

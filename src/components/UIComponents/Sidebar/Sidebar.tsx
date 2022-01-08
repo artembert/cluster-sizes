@@ -28,15 +28,21 @@ const Sidebar: FunctionComponent = () => {
           <tr>
             <td>zoom-level</td>
             <td>
-              <input value={zoomLevel.toFixed(2)} type="number" disabled />
+              <input
+                value={zoomLevel.toFixed(2)}
+                type="number"
+                className={styles.input}
+                disabled
+              />
             </td>
           </tr>
           <tr>
             <td>cell-size</td>
             <td>
               <input
-                value={cellOuterRadius}
+                value={cellOuterRadius.toFixed(2)}
                 type="number"
+                className={styles.input}
                 min={MIN_CELL_RADIUS}
                 onChange={handleCellSizeChange}
               />
@@ -44,22 +50,24 @@ const Sidebar: FunctionComponent = () => {
             </td>
           </tr>
           <tr>
-            <td>cell-size in meters</td>
+            <td></td>
             <td>
               <input
                 value={cellSizeInMeters.toFixed(2)}
                 type="number"
+                className={styles.input}
                 disabled
               />
               &nbsp;m
             </td>
           </tr>
           <tr>
-            <td>marker-radius</td>
+            <td>max marker-radius</td>
             <td>
               <input
-                value={cellInnerRadius.toFixed(1)}
+                value={cellInnerRadius.toFixed(2)}
                 type="number"
+                className={styles.input}
                 disabled
               />
               &nbsp;px
