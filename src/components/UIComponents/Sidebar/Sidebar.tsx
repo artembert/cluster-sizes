@@ -5,6 +5,7 @@ import {
   useGridSellSize,
   useGridSellSizeDispatch,
 } from "../../../contexts/GridCellSizeContext";
+import ProfilePlot from "../ProfilePlot/ProfilePlot";
 import styles from "./Sidebar.module.css";
 
 const Sidebar: FunctionComponent = () => {
@@ -75,6 +76,9 @@ const Sidebar: FunctionComponent = () => {
           </tr>
         </tbody>
       </table>
+      <div className={styles.profilePlot}>
+        <ProfilePlot width={240} height={240} />
+      </div>
     </div>
   );
 };
