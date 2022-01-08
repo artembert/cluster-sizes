@@ -50,11 +50,19 @@ const Map: FunctionComponent = () => {
       style: `https://api.maptiler.com/maps/streets/style.json?key=${API_KEY}`,
       center: [lng, lat],
       zoom: zoom,
-      dragPan: false,
     }) as maplibregl.Map;
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
     map.current.on("zoomstart", () => {
       handleZoomStart();
+    });
+    map.current.on("dragstart", () => {
+      handleZoomStart();
+    });
+    map.current.on("dragend", () => {
+      handleZoomChange({
+        zoomLevel: map.current.getZoom(),
+        lat: map.current.getCenter().lat,
+      });
     });
     map.current.on("zoomend", () => {
       handleZoomChange({
