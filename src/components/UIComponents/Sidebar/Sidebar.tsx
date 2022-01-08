@@ -9,12 +9,15 @@ import styles from "./Sidebar.module.css";
 
 const Sidebar: FunctionComponent = () => {
   const dispatchGridCellSize = useGridSellSizeDispatch();
-  const { cellOuterRadius, cellInnerRadius, zoomLevel } = useGridSellSize();
+  const { cellOuterRadius, cellInnerRadius, zoomLevel, cellSizeInMeters } =
+    useGridSellSize();
 
   function handleCellSizeChange(e: ChangeEvent<HTMLInputElement>) {
     dispatchGridCellSize({
       type: ActionKind.Change,
-      payload: e.target.valueAsNumber,
+      payload: {
+        outerRadius: e.target.valueAsNumber,
+      },
     });
   }
 
@@ -37,7 +40,18 @@ const Sidebar: FunctionComponent = () => {
                 min={MIN_CELL_RADIUS}
                 onChange={handleCellSizeChange}
               />
-              px
+              &nbsp;px
+            </td>
+          </tr>
+          <tr>
+            <td>cell-size in meters</td>
+            <td>
+              <input
+                value={cellSizeInMeters.toFixed(2)}
+                type="number"
+                disabled
+              />
+              &nbsp;m
             </td>
           </tr>
           <tr>
@@ -48,7 +62,7 @@ const Sidebar: FunctionComponent = () => {
                 type="number"
                 disabled
               />
-              px
+              &nbsp;px
             </td>
           </tr>
         </tbody>

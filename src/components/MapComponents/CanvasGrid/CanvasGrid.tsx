@@ -59,7 +59,7 @@ function drawGrid(
   hexagonRadius: number,
   cellInnerRadius: number
 ): void {
-  ctx.clearRect(0, 0, width, height);
+  clearGrid(ctx, width, height);
   const yStartCoords = getYStartCoordsForAllLines(height, hexagonRadius);
   yStartCoords.forEach((y) => {
     let x = hexagonRadius;
@@ -72,6 +72,14 @@ function drawGrid(
       j++;
     }
   });
+}
+
+function clearGrid(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number
+): void {
+  ctx.clearRect(0, 0, width, height);
 }
 
 function getRandomMarkerSize(max: number): number {
@@ -95,7 +103,7 @@ function getPieChartContent(): PieChartItem[] {
 }
 
 const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
-  const { cellOuterRadius, cellInnerRadius } = useGridSellSize();
+  const { cellOuterRadius, cellInnerRadius, isGridVisible } = useGridSellSize();
 
   function draw(ctx: CanvasRenderingContext2D): void {
     return drawGrid.call(
@@ -108,7 +116,13 @@ const CanvasGrid: FunctionComponent<Props> = ({ width, height }) => {
     );
   }
 
-  return <Canvas draw={draw} width={width} height={height} />;
+  function clear(ctx: CanvasRenderingContext2D): void {
+    return clearGrid.call(null, ctx, width, height);
+  }
+
+  return (
+    <Canvas draw={isGridVisible ? draw : clear} width={width} height={height} />
+  );
 };
 
 export default CanvasGrid;
