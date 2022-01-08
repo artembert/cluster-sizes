@@ -77,7 +77,7 @@ const Sidebar: FunctionComponent = () => {
         </tbody>
       </table>
       <div className={styles.profilePlot}>
-        <ProfilePlot width={240} height={240} />
+        <ProfilePlot width={240} height={300} />
       </div>
     </div>
   );

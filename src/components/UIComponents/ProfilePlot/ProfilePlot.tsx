@@ -3,16 +3,17 @@ import { INITIAL_LATITUDE } from "../../../contexts/GridCellSizeContext";
 import { getCellSizeInMetersByZoom } from "../../../geo-helpers/grid-cell-size-by-zoom.helper";
 import { getPixelsFromMeters } from "../../../geo-helpers/meters-per-pixels.helper";
 import Canvas from "../../MapComponents/Canvas/Canvas";
+import styles from "./ProfilePlot.module.css";
 
 interface Props {
   width: number;
   height: number;
 }
 
-const metersColor = "#FFA000";
-const pxColor = "#03A9F4";
+export const metersColor = "#FFA000";
+export const pxColor = "#03A9F4";
 const bottomLabelPadding = 10;
-const bottomValuesLabelsPadding = 30;
+const bottomValuesLabelsPadding = 50;
 const zoomLevels = Array.from({ length: 45 })
   .fill(undefined)
   .map((_, index) => 0.25 * index)
@@ -29,9 +30,10 @@ function drawPlot(
   clearGrid(ctx, width, height);
   const cellSizes = zoomLevels.map((zoomLevel) => ({
     zoomLevel,
-    cellSizeInMeters: Math.log10(
-      getCellSizeInMetersByZoom({ zoomLevel, lat: INITIAL_LATITUDE })
-    ),
+    cellSizeInMeters: getCellSizeInMetersByZoom({
+      zoomLevel,
+      lat: INITIAL_LATITUDE,
+    }),
     cellSizeInPx: getPixelsFromMeters({
       lat: INITIAL_LATITUDE,
       zoomLevel,
@@ -66,7 +68,7 @@ function drawPlot(
       chartHeight + 3
     );
   });
-  renderLabel(ctx, "zoom-level", width / 2, height);
+  renderLabel(ctx, "zoom-level", width / 2, height - bottomLabelPadding);
 }
 
 function renderCellInMeters({
@@ -90,7 +92,7 @@ function renderCellInMeters({
     firstLineIndent + indentBetweenLines * index - 2,
     chartHeight - (cellSizeInMeters / metersMaxHeight) * chartHeight
   );
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 4;
   ctx.strokeStyle = metersColor;
   ctx.stroke();
   ctx.closePath();
@@ -164,7 +166,29 @@ const ProfilePlot: FunctionComponent<Props> = ({ width, height }) => {
     return drawPlot.call(null, ctx, width, height);
   }
 
-  return <Canvas draw={draw} width={width} height={height} />;
+  return (
+    <div className={styles.container}>
+      <div className={styles.plot}>
+        <Canvas draw={draw} width={width} height={height} />
+      </div>
+      <div className={styles.legend}>
+        <div className={styles.legendItem}>
+          <span
+            className={styles.marker}
+            style={{ backgroundColor: metersColor }}
+          ></span>
+          <span className={styles.label}>Cell radius, m</span>
+        </div>
+        <div className={styles.legendItem}>
+          <span
+            className={styles.marker}
+            style={{ backgroundColor: pxColor }}
+          ></span>
+          <span className={styles.label}>Cell radius, px</span>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ProfilePlot;

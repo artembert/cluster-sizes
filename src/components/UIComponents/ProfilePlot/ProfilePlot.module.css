@@ -1,0 +1,27 @@
+.container {
+}
+
+.plot {
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.marker {
+  width: 20px;
+  height: 4px;
+}
+
+.label {
+  margin-left: 4px;
+}
