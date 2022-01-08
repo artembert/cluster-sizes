@@ -29,6 +29,7 @@ function getYStartCoordsForAllLines(
     yStartCoords.push(y);
     y += 2 * hexagonRadius * Math.sin(HEXAGON_ANGLE);
   }
+  yStartCoords.push(y);
   return yStartCoords;
 }
 
@@ -71,6 +72,8 @@ function drawGrid(
       y += (-1) ** j * hexagonRadius * Math.sin(HEXAGON_ANGLE);
       j++;
     }
+    const markerRadius = getRandomMarkerSize(cellInnerRadius);
+    drawHexagon(ctx, x, y, hexagonRadius, markerRadius);
   });
 }
 
