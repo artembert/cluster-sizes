@@ -16,7 +16,7 @@ const Map: FunctionComponent = () => {
   const lng = 30.32;
   const lat = INITIAL_LATITUDE;
   const zoom = INITIAL_ZOOM_LEVEL;
-  const API_KEY = "get_your_own_OpIi9ZULNHzrESv6T2vL";
+  const API_KEY = "WG5WfHW7QZ4Jd8QZ6hkg";
 
   function handleZoomChange({
     zoomLevel,
