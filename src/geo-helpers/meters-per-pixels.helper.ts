@@ -1,12 +1,12 @@
 export function getMetersPerPixel({
   zoomLevel,
-  latitude,
+  lat,
 }: {
-  latitude: number;
+  lat: number;
   zoomLevel: number;
 }) {
   const EARTH_CIRCUMREFERENCE = 40075017;
-  const latitudeRadians = latitude * (Math.PI / 180);
+  const latitudeRadians = lat * (Math.PI / 180);
   return (
     (EARTH_CIRCUMREFERENCE * Math.cos(latitudeRadians)) /
     Math.pow(2, zoomLevel + 8)
@@ -14,13 +14,13 @@ export function getMetersPerPixel({
 }
 
 export function getPixelsFromMeters({
-  latitude,
+  lat,
   meters,
   zoomLevel,
 }: {
-  latitude: number;
+  lat: number;
   meters: number;
   zoomLevel: number;
 }) {
-  return meters / getMetersPerPixel({ latitude, zoomLevel });
+  return meters / getMetersPerPixel({ lat, zoomLevel });
 }

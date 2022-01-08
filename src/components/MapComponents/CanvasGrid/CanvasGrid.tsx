@@ -41,8 +41,8 @@ function drawHexagon(
   cellInnerRadius: number
 ): void {
   ctx.beginPath();
+  ctx.strokeStyle = GRID_CELL_BORDER_COLOR;
   for (var i = 0; i < 6; i++) {
-    ctx.strokeStyle = GRID_CELL_BORDER_COLOR;
     ctx.lineTo(
       x + hexagonRadius * Math.cos(HEXAGON_ANGLE * i),
       y + hexagonRadius * Math.sin(HEXAGON_ANGLE * i)

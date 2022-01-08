@@ -9,6 +9,7 @@ import { getCellSizeInMetersByZoom } from "../geo-helpers/grid-cell-size-by-zoom
 import { getPixelsFromMeters } from "../geo-helpers/meters-per-pixels.helper";
 
 export const MIN_CELL_RADIUS = 10;
+export const MAX_CELL_RADIUS = 80;
 export const INITIAL_ZOOM_LEVEL = 9;
 export const INITIAL_LATITUDE = 59.94;
 
@@ -67,16 +68,22 @@ export type Action =
   | CellOuterRadiusChangeAction;
 
 const initialCellOuterRadius = getPixelsFromMeters({
-  latitude: INITIAL_LATITUDE,
+  lat: INITIAL_LATITUDE,
   zoomLevel: INITIAL_ZOOM_LEVEL,
-  meters: getCellSizeInMetersByZoom(INITIAL_ZOOM_LEVEL),
+  meters: getCellSizeInMetersByZoom({
+    zoomLevel: INITIAL_ZOOM_LEVEL,
+    lat: INITIAL_LATITUDE,
+  }),
 });
 
 const initialState: State = {
   cellOuterRadius: initialCellOuterRadius,
   cellInnerRadius: getHexagonInnerCirclieRadius(initialCellOuterRadius),
   zoomLevel: INITIAL_ZOOM_LEVEL,
-  cellSizeInMeters: getCellSizeInMetersByZoom(INITIAL_ZOOM_LEVEL),
+  cellSizeInMeters: getCellSizeInMetersByZoom({
+    zoomLevel: INITIAL_ZOOM_LEVEL,
+    lat: INITIAL_LATITUDE,
+  }),
   isGridVisible: true,
 };
 
@@ -106,10 +113,13 @@ function tasksReducer(prevState: State, action: Action): State {
     };
   }
   if (isZoomEndAction(action)) {
-    const meters = getCellSizeInMetersByZoom(action.payload.zoomLevel);
+    const meters = getCellSizeInMetersByZoom({
+      zoomLevel: action.payload.zoomLevel,
+      lat: action.payload.lat,
+    });
     const cellOuterRadius = getPixelsFromMeters({
       zoomLevel: action.payload.zoomLevel,
-      latitude: action.payload.lat,
+      lat: action.payload.lat,
       meters,
     });
     return {
