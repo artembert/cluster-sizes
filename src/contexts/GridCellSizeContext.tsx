@@ -5,11 +5,11 @@ import {
   useContext,
   useReducer,
 } from "react";
-import { getMetersPerPixel } from "../geo-helpers/meters-per-pixels.helper";
+import { getCellSizeInMetersByZoom } from "../geo-helpers/grid-cell-size-by-zoom.helper";
+import { getPixelsFromMeters } from "../geo-helpers/meters-per-pixels.helper";
 
-const INITIAL_CELL_OUTER_RADIUS = 50;
 export const MIN_CELL_RADIUS = 10;
-export const INITIAL_ZOOM_LEVEL = 5;
+export const INITIAL_ZOOM_LEVEL = 9;
 export const INITIAL_LATITUDE = 59.94;
 
 interface BaseAction<Payload extends unknown> {
@@ -66,25 +66,27 @@ export type Action =
   | ZoomChangeStartAction
   | CellOuterRadiusChangeAction;
 
-const initialCellSize: State = {
-  cellOuterRadius: INITIAL_CELL_OUTER_RADIUS,
-  cellInnerRadius: getHexagonInnerCirclieRadius(INITIAL_CELL_OUTER_RADIUS),
+const initialCellOuterRadius = getPixelsFromMeters({
+  latitude: INITIAL_LATITUDE,
   zoomLevel: INITIAL_ZOOM_LEVEL,
-  cellSizeInMeters:
-    getMetersPerPixel({
-      latitude: INITIAL_LATITUDE,
-      zoomLevel: INITIAL_ZOOM_LEVEL,
-    }) * INITIAL_CELL_OUTER_RADIUS,
+  meters: getCellSizeInMetersByZoom(INITIAL_ZOOM_LEVEL),
+});
+
+const initialState: State = {
+  cellOuterRadius: initialCellOuterRadius,
+  cellInnerRadius: getHexagonInnerCirclieRadius(initialCellOuterRadius),
+  zoomLevel: INITIAL_ZOOM_LEVEL,
+  cellSizeInMeters: getCellSizeInMetersByZoom(INITIAL_ZOOM_LEVEL),
   isGridVisible: true,
 };
 
-export const GridSellSizeContext = createContext(initialCellSize);
+export const GridSellSizeContext = createContext(initialState);
 export const GridSellDispatchContext = createContext<Dispatch<Action>>(
   null as any
 );
 
 export const GridSellSizeProvider: FunctionComponent = ({ children }) => {
-  const [cellSize, dispatch] = useReducer(tasksReducer, initialCellSize);
+  const [cellSize, dispatch] = useReducer(tasksReducer, initialState);
 
   return (
     <GridSellSizeContext.Provider value={cellSize}>
@@ -103,16 +105,20 @@ function tasksReducer(prevState: State, action: Action): State {
       cellInnerRadius: getHexagonInnerCirclieRadius(action.payload.outerRadius),
     };
   }
-  if (isZoomChangeAction(action)) {
+  if (isZoomEndAction(action)) {
+    const meters = getCellSizeInMetersByZoom(action.payload.zoomLevel);
+    const cellOuterRadius = getPixelsFromMeters({
+      zoomLevel: action.payload.zoomLevel,
+      latitude: action.payload.lat,
+      meters,
+    });
     return {
       ...prevState,
       isGridVisible: true,
       zoomLevel: action.payload.zoomLevel,
-      cellSizeInMeters:
-        getMetersPerPixel({
-          latitude: action.payload.lat,
-          zoomLevel: action.payload.zoomLevel,
-        }) * prevState.cellOuterRadius,
+      cellOuterRadius,
+      cellInnerRadius: getHexagonInnerCirclieRadius(cellOuterRadius),
+      cellSizeInMeters: meters,
     };
   }
   if (isZoomChangeStartAction(action)) {
@@ -137,7 +143,7 @@ function getHexagonInnerCirclieRadius(hexagonRadius: number): number {
   return (Math.sqrt(3) * hexagonRadius) / 2;
 }
 
-function isZoomChangeAction(action: Action): action is ZoomEndAction {
+function isZoomEndAction(action: Action): action is ZoomEndAction {
   return action.type === ActionKind.ZoomEnd;
 }
 
