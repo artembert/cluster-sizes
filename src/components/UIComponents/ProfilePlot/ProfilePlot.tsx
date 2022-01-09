@@ -14,13 +14,13 @@ export const metersColor = "#FFA000";
 export const pxColor = "#03A9F4";
 const bottomLabelPadding = 10;
 const bottomValuesLabelsPadding = 50;
+const firstLineIndent = 8;
+const font = "12px sans-serif";
+
 const zoomLevels = Array.from({ length: 45 })
   .fill(undefined)
   .map((_, index) => 0.25 * index)
   .slice(25);
-const firstLineIndent = 6;
-const font = "12px sans-serif";
-console.log(zoomLevels);
 
 function drawPlot(
   ctx: CanvasRenderingContext2D,
@@ -40,7 +40,9 @@ function drawPlot(
       meters: getCellSizeInMetersByZoom({ zoomLevel, lat: INITIAL_LATITUDE }),
     }),
   }));
-  const indentBetweenLines = Math.floor(width / cellSizes.length);
+  const indentBetweenLines = Math.floor(
+    (width - 2 * firstLineIndent) / cellSizes.length
+  );
   const metersMaxHeight = Math.max(...cellSizes.map((_) => _.cellSizeInMeters));
   const pxMaxHeight = Math.max(...cellSizes.map((_) => _.cellSizeInPx));
   const chartHeight = height - bottomValuesLabelsPadding - bottomLabelPadding;
@@ -69,6 +71,14 @@ function drawPlot(
     );
   });
   renderLabel(ctx, "zoom-level", width / 2, height - bottomLabelPadding);
+  // addVerticalAxe({
+  //   ctx,
+  //   unit: "px",
+  //   max: pxMaxHeight,
+  //   x: 1,
+  //   y: chartHeight,
+  //   height: chartHeight,
+  // });
 }
 
 function renderCellInMeters({
@@ -86,6 +96,7 @@ function renderCellInMeters({
   cellSizeInMeters: number;
   metersMaxHeight: number;
 }): void {
+  ctx.save();
   ctx.beginPath();
   ctx.moveTo(firstLineIndent + indentBetweenLines * index - 2, chartHeight);
   ctx.lineTo(
@@ -96,6 +107,7 @@ function renderCellInMeters({
   ctx.strokeStyle = metersColor;
   ctx.stroke();
   ctx.closePath();
+  ctx.restore();
 }
 
 function renderCellInPx({
@@ -113,16 +125,18 @@ function renderCellInPx({
   cellSizeInPx: number;
   pxMaxHeight: number;
 }): void {
+  ctx.save();
   ctx.beginPath();
   ctx.moveTo(firstLineIndent + indentBetweenLines * index + 2, chartHeight);
   ctx.lineTo(
     firstLineIndent + indentBetweenLines * index + 2,
     chartHeight - (cellSizeInPx / pxMaxHeight) * chartHeight
   );
+  ctx.lineWidth = 4;
   ctx.strokeStyle = pxColor;
   ctx.stroke();
-
   ctx.closePath();
+  ctx.restore();
 }
 
 function renderValueLabel(
@@ -153,6 +167,35 @@ function renderLabel(
   ctx.restore();
 }
 
+function addVerticalAxe({
+  ctx,
+  x,
+  y,
+  height,
+  max,
+  unit,
+}: {
+  ctx: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  height: number;
+  max: number;
+  unit: string;
+}): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y - height);
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.textBaseline = "top";
+  ctx.textAlign = "left";
+  ctx.fillText(`${max.toFixed(0)} ${unit}`, 0, 0);
+  ctx.closePath();
+  ctx.restore();
+}
+
 function clearGrid(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -168,6 +211,10 @@ const ProfilePlot: FunctionComponent<Props> = ({ width, height }) => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.title}>
+        The relationship between the cell size of the hexagonal grid in meters
+        and pixels at different zoom levels
+      </div>
       <div className={styles.plot}>
         <Canvas draw={draw} width={width} height={height} />
       </div>

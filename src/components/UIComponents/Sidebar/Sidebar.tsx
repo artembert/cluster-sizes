@@ -5,7 +5,7 @@ import {
   useGridSellSize,
   useGridSellSizeDispatch,
 } from "../../../contexts/GridCellSizeContext";
-import ProfilePlot from "../ProfilePlot/ProfilePlot";
+import ProfilePlot, { metersColor, pxColor } from "../ProfilePlot/ProfilePlot";
 import styles from "./Sidebar.module.css";
 
 const Sidebar: FunctionComponent = () => {
@@ -24,7 +24,7 @@ const Sidebar: FunctionComponent = () => {
 
   return (
     <div className={styles.layout}>
-      <table>
+      <table className={styles.table}>
         <tbody>
           <tr>
             <td>zoom-level</td>
@@ -38,8 +38,11 @@ const Sidebar: FunctionComponent = () => {
             </td>
           </tr>
           <tr>
-            <td>cell-size</td>
-            <td>
+            <td>Cell radius</td>
+            <td
+              className={styles.associatedField}
+              style={{ backgroundColor: pxColor }}
+            >
               <input
                 value={cellOuterRadius.toFixed(2)}
                 type="number"
@@ -52,7 +55,10 @@ const Sidebar: FunctionComponent = () => {
           </tr>
           <tr>
             <td></td>
-            <td>
+            <td
+              className={styles.associatedField}
+              style={{ backgroundColor: metersColor }}
+            >
               <input
                 value={cellSizeInMeters.toFixed(2)}
                 type="number"

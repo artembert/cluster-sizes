@@ -3,11 +3,21 @@
   grid-gap: 8px;
 }
 
+.table {
+  margin: 8px 4px 0;
+}
+
 .input {
   width: 80px;
   text-align: right;
 }
 
 .profilePlot {
+  margin-top: 36px;
   padding: 0 8px 0;
+}
+
+.associatedField {
+  padding: 4px;
+  white-space: nowrap;
 }

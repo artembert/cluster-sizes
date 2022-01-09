@@ -2,6 +2,7 @@
 }
 
 .plot {
+  margin-top: 8px;
 }
 
 .legend {
@@ -24,4 +25,9 @@
 
 .label {
   margin-left: 4px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: bold;
 }
