@@ -18,7 +18,7 @@
 }
 
 .title {
-  padding: 8px 4px 8px;
+  padding: 8px 6px 8px;
   margin: 0;
 }
 
@@ -27,6 +27,8 @@
   border-right: 1px solid var(--grey-400);
   background-color: var(--grey-50);
   width: min-content;
+  overflow: scroll;
+  padding: 0 0 32px;
 }
 
 .main {

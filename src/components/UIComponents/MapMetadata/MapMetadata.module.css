@@ -1,0 +1,12 @@
+.table {
+  width: fit-content;
+}
+
+.input {
+  width: 60px;
+  text-align: right;
+}
+.associatedField {
+  padding: 4px;
+  white-space: nowrap;
+}

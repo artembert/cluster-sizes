@@ -1,29 +1,20 @@
 .layout {
   display: grid;
   grid-gap: 8px;
-}
-
-.table {
-  margin: 8px 4px 0;
-  width: fit-content;
-}
-
-.input {
-  width: 80px;
-  text-align: right;
+  padding: 16px 8px 24px;
+  grid-gap: 16px;
 }
 
 .profilePlot {
-  margin-top: 16px;
-  padding: 0 8px 0;
-}
-
-.associatedField {
-  padding: 4px;
-  white-space: nowrap;
+  margin: 0;
 }
 
 .disclaimer {
-  margin-top: 16px;
-  padding: 0 8px;
+  margin: 0;
+}
+
+.columns {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }

@@ -1,3 +1,4 @@
+import produce from "immer";
 import {
   createContext,
   Dispatch,
@@ -7,13 +8,20 @@ import {
 } from "react";
 import { getCellSizeInMetersByZoom } from "../geo-helpers/grid-cell-size-by-zoom.helper";
 import { getPixelsFromMeters } from "../geo-helpers/meters-per-pixels.helper";
+import { initialCellSizes } from "./CellSizeContext";
+import { ActionKind } from "./models/action-kind.constant";
+import {
+  RefreshAction,
+  ZoomChangeStartAction,
+  ZoomEndAction,
+} from "./models/actions.interfaces";
 
 export const MIN_CELL_RADIUS = 10;
 export const MAX_CELL_RADIUS = 80;
-export const INITIAL_ZOOM_LEVEL = 9;
+export const INITIAL_ZOOM_LEVEL = 9.01;
 export const INITIAL_LATITUDE = 59.94;
 
-interface BaseAction<Payload extends unknown> {
+export interface BaseAction<Payload extends unknown> {
   type: ActionKind;
   payload: Payload;
 }
@@ -26,53 +34,14 @@ export type State = {
   isGridVisible: boolean;
 };
 
-export const enum ActionKind {
-  Change = "CHANGE",
-  ZoomEnd = "ZOOM_END",
-  ZoomStart = "ZOOM_START",
-}
-
-interface CellOuterRadiusChangePayload {
-  outerRadius: number;
-}
-
-export interface CellOuterRadiusChangeAction
-  extends BaseAction<CellOuterRadiusChangePayload> {
-  type: ActionKind.Change;
-  payload: {
-    outerRadius: number;
-  };
-}
-
-interface ZoomChangePayload {
-  zoomLevel: number;
-  lat: number;
-}
-
-export interface ZoomEndAction extends BaseAction<ZoomChangePayload> {
-  type: ActionKind.ZoomEnd;
-  payload: {
-    zoomLevel: number;
-    lat: number;
-  };
-}
-
-export interface ZoomChangeStartAction extends BaseAction<undefined> {
-  type: ActionKind.ZoomStart;
-  payload: undefined;
-}
-
-export type Action =
-  | ZoomEndAction
-  | ZoomChangeStartAction
-  | CellOuterRadiusChangeAction;
+export type Action = ZoomEndAction | ZoomChangeStartAction | RefreshAction;
 
 const initialCellOuterRadius = getPixelsFromMeters({
   lat: INITIAL_LATITUDE,
   zoomLevel: INITIAL_ZOOM_LEVEL,
   meters: getCellSizeInMetersByZoom({
     zoomLevel: INITIAL_ZOOM_LEVEL,
-    lat: INITIAL_LATITUDE,
+    cellSizes: initialCellSizes,
   }),
 });
 
@@ -82,7 +51,7 @@ const initialState: State = {
   zoomLevel: INITIAL_ZOOM_LEVEL,
   cellSizeInMeters: getCellSizeInMetersByZoom({
     zoomLevel: INITIAL_ZOOM_LEVEL,
-    lat: INITIAL_LATITUDE,
+    cellSizes: initialCellSizes,
   }),
   isGridVisible: true,
 };
@@ -105,37 +74,44 @@ export const GridSellSizeProvider: FunctionComponent = ({ children }) => {
 };
 
 function tasksReducer(prevState: State, action: Action): State {
-  if (isCellOuterRadiusChangeAction(action)) {
-    return {
-      ...prevState,
-      cellOuterRadius: action.payload.outerRadius,
-      cellInnerRadius: getHexagonInnerCirclieRadius(action.payload.outerRadius),
-    };
-  }
   if (isZoomEndAction(action)) {
     const meters = getCellSizeInMetersByZoom({
       zoomLevel: action.payload.zoomLevel,
-      lat: action.payload.lat,
+      cellSizes: action.payload.cellSizes,
     });
     const cellOuterRadius = getPixelsFromMeters({
       zoomLevel: action.payload.zoomLevel,
       lat: action.payload.lat,
       meters,
     });
-    return {
-      ...prevState,
-      isGridVisible: true,
-      zoomLevel: action.payload.zoomLevel,
-      cellOuterRadius,
-      cellInnerRadius: getHexagonInnerCirclieRadius(cellOuterRadius),
-      cellSizeInMeters: meters,
-    };
+    return produce(prevState, (draft) => {
+      draft.isGridVisible = true;
+      draft.zoomLevel = action.payload.zoomLevel;
+      draft.cellOuterRadius = cellOuterRadius;
+      draft.cellInnerRadius = getHexagonInnerCirclieRadius(cellOuterRadius);
+      draft.cellSizeInMeters = meters;
+    });
   }
   if (isZoomChangeStartAction(action)) {
-    return {
-      ...prevState,
-      isGridVisible: false,
-    };
+    return produce(prevState, (draft) => {
+      draft.isGridVisible = false;
+    });
+  }
+  if (isRefreshAction(action)) {
+    const meters = getCellSizeInMetersByZoom({
+      zoomLevel: prevState.zoomLevel,
+      cellSizes: action.payload.cellSizes,
+    });
+    const cellOuterRadius = getPixelsFromMeters({
+      zoomLevel: prevState.zoomLevel,
+      lat: INITIAL_LATITUDE,
+      meters,
+    });
+    return produce(prevState, (draft) => {
+      draft.cellOuterRadius = cellOuterRadius;
+      draft.cellInnerRadius = getHexagonInnerCirclieRadius(cellOuterRadius);
+      draft.cellSizeInMeters = meters;
+    });
   }
 
   throw Error("Unknown action: " + action);
@@ -157,14 +133,12 @@ function isZoomEndAction(action: Action): action is ZoomEndAction {
   return action.type === ActionKind.ZoomEnd;
 }
 
+function isRefreshAction(action: Action): action is RefreshAction {
+  return action.type === ActionKind.Refresh;
+}
+
 function isZoomChangeStartAction(
   action: Action
 ): action is ZoomChangeStartAction {
   return action.type === ActionKind.ZoomStart;
-}
-
-function isCellOuterRadiusChangeAction(
-  action: Action
-): action is CellOuterRadiusChangeAction {
-  return action.type === ActionKind.Change;
 }

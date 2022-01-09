@@ -1,16 +1,18 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { FunctionComponent, useEffect, useRef } from "react";
+import { useCellSize } from "../../../contexts/CellSizeContext";
 import {
-  ActionKind,
   INITIAL_LATITUDE,
   INITIAL_ZOOM_LEVEL,
   useGridSellSizeDispatch,
 } from "../../../contexts/GridCellSizeContext";
+import { ActionKind } from "../../../contexts/models/action-kind.constant";
 import styles from "./Map.module.css";
 
 const Map: FunctionComponent = () => {
   const dispatch = useGridSellSizeDispatch();
+  const cellSizes = useCellSize();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map>(null as any);
   const lng = 30.32;
@@ -30,6 +32,7 @@ const Map: FunctionComponent = () => {
       payload: {
         lat,
         zoomLevel,
+        cellSizes,
       },
     });
   }
@@ -50,8 +53,12 @@ const Map: FunctionComponent = () => {
       style: `https://api.maptiler.com/maps/streets/style.json?key=${API_KEY}`,
       center: [lng, lat],
       zoom: zoom,
+      minZoom: 5,
     }) as maplibregl.Map;
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
+  });
+
+  useEffect(() => {
     map.current.on("zoomstart", () => {
       handleZoomStart();
     });

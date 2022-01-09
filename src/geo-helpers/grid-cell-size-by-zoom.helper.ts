@@ -1,23 +1,20 @@
-import { MIN_CELL_RADIUS } from "../contexts/GridCellSizeContext";
-import { getMetersPerPixel } from "./meters-per-pixels.helper";
+import { DefinedZoomLevel, MetersCellSizes } from "../contexts/CellSizeContext";
 
 export function getCellSizeInMetersByZoom({
   zoomLevel,
-  lat,
+  cellSizes,
 }: {
   zoomLevel: number;
-  lat: number;
+  cellSizes: MetersCellSizes;
 }): number {
-  const minSellRadius = getMetersPerPixel({ zoomLevel, lat }) * MIN_CELL_RADIUS;
-  if (Math.floor(zoomLevel) < 12) {
-    return 1500 * 2 ** (11 - Math.floor(zoomLevel));
+  const list = Object.entries<number>(cellSizes) as [
+    DefinedZoomLevel,
+    number
+  ][];
+  for (let [savedZoomLevel] of list) {
+    if (zoomLevel < Number(savedZoomLevel)) {
+      return cellSizes[savedZoomLevel] as number;
+    }
   }
-  if (Math.floor(zoomLevel) === 12) {
-    return 1000;
-  }
-
-  if (zoomLevel >= 13 && zoomLevel <= 13.5) {
-    return 500;
-  }
-  return minSellRadius;
+  return list[list.length - 1][1];
 }
