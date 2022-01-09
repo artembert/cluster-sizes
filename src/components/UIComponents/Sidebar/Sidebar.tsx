@@ -83,7 +83,7 @@ const Sidebar: FunctionComponent = () => {
         </tbody>
       </table>
       <div className={styles.profilePlot}>
-        <ProfilePlot width={240} height={300} />
+        <ProfilePlot width={340} height={300} />
       </div>
       <div className={styles.disclaimer}>
         <div>

@@ -16,6 +16,7 @@ const bottomLabelPadding = 10;
 const bottomValuesLabelsPadding = 50;
 const firstLineIndent = 8;
 const font = "12px sans-serif";
+const valueFont = "11px sans-serif";
 
 const zoomLevels = Array.from({ length: 45 })
   .fill(undefined)
@@ -61,22 +62,32 @@ function drawPlot(
       cellSizeInPx,
       pxMaxHeight,
     });
-    renderValueLabel(
+    renderValueLabel({
       ctx,
-      zoomLevel.toFixed(2),
-      firstLineIndent + indentBetweenLines * index + 3,
-      chartHeight + 3
-    );
+      text: zoomLevel.toFixed(2),
+      x: firstLineIndent + indentBetweenLines * index + 3,
+      y: chartHeight + 3,
+    });
   });
   renderLabel(ctx, "zoom-level", width / 2, height - bottomLabelPadding);
-  // addVerticalAxe({
-  //   ctx,
-  //   unit: "px",
-  //   max: pxMaxHeight,
-  //   x: 1,
-  //   y: chartHeight,
-  //   height: chartHeight,
-  // });
+  addLeftVerticalAxe({
+    ctx,
+    unit: "px",
+    max: pxMaxHeight,
+    x: 1,
+    y: chartHeight,
+    height: chartHeight,
+    valueOfDivision: chartHeight / pxMaxHeight,
+  });
+  addRightVerticalAxe({
+    ctx,
+    unit: "m",
+    max: metersMaxHeight,
+    x: width - 1,
+    y: chartHeight,
+    height: chartHeight,
+    valueOfDivision: chartHeight / metersMaxHeight,
+  });
 }
 
 function renderCellInMeters({
@@ -94,13 +105,12 @@ function renderCellInMeters({
   cellSizeInMeters: number;
   metersMaxHeight: number;
 }): void {
+  const x = firstLineIndent + indentBetweenLines * index + 2;
+  const y = chartHeight - (cellSizeInMeters / metersMaxHeight) * chartHeight;
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(firstLineIndent + indentBetweenLines * index - 2, chartHeight);
-  ctx.lineTo(
-    firstLineIndent + indentBetweenLines * index - 2,
-    chartHeight - (cellSizeInMeters / metersMaxHeight) * chartHeight
-  );
+  ctx.moveTo(x, chartHeight);
+  ctx.lineTo(x, y);
   ctx.lineWidth = 4;
   ctx.strokeStyle = metersColor;
   ctx.stroke();
@@ -125,9 +135,9 @@ function renderCellInPx({
 }): void {
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(firstLineIndent + indentBetweenLines * index + 2, chartHeight);
+  ctx.moveTo(firstLineIndent + indentBetweenLines * index - 2, chartHeight);
   ctx.lineTo(
-    firstLineIndent + indentBetweenLines * index + 2,
+    firstLineIndent + indentBetweenLines * index - 2,
     chartHeight - (cellSizeInPx / pxMaxHeight) * chartHeight
   );
   ctx.lineWidth = 4;
@@ -137,17 +147,42 @@ function renderCellInPx({
   ctx.restore();
 }
 
-function renderValueLabel(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number
-): void {
+function renderValueLabel({
+  ctx,
+  text,
+  x,
+  y,
+}: {
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  x: number;
+  y: number;
+}): void {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(-Math.PI / 2);
   ctx.textAlign = "right";
   ctx.font = font;
+  ctx.fillText(text, 0, 0);
+  ctx.restore();
+}
+
+function renderValue({
+  ctx,
+  text,
+  x,
+  y,
+}: {
+  ctx: CanvasRenderingContext2D;
+  text: string;
+  x: number;
+  y: number;
+}): void {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = "right";
+  ctx.font = valueFont;
   ctx.fillText(text, 0, 0);
   ctx.restore();
 }
@@ -165,13 +200,14 @@ function renderLabel(
   ctx.restore();
 }
 
-function addVerticalAxe({
+function addLeftVerticalAxe({
   ctx,
   x,
   y,
   height,
   max,
   unit,
+  valueOfDivision,
 }: {
   ctx: CanvasRenderingContext2D;
   x: number;
@@ -179,6 +215,7 @@ function addVerticalAxe({
   height: number;
   max: number;
   unit: string;
+  valueOfDivision: number;
 }): void {
   ctx.save();
   ctx.beginPath();
@@ -187,9 +224,63 @@ function addVerticalAxe({
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  ctx.textBaseline = "top";
+  const values = new Array(Math.floor(max / 10) + 1)
+    .fill(undefined)
+    .map((_, index) => index * 10)
+    .slice(1);
+
+  ctx.textBaseline = "middle";
   ctx.textAlign = "left";
-  ctx.fillText(`${max.toFixed(0)} ${unit}`, 0, 0);
+  values.forEach((mark) => {
+    const markerY = height - mark * valueOfDivision;
+    ctx.fillRect(x, markerY, 3, 1);
+    ctx.fillText(`${mark.toFixed(0)} ${unit}`, 5, markerY);
+  });
+
+  ctx.closePath();
+  ctx.restore();
+}
+
+function addRightVerticalAxe({
+  ctx,
+  x,
+  y,
+  height,
+  max,
+  unit,
+  valueOfDivision,
+}: {
+  ctx: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  height: number;
+  max: number;
+  unit: string;
+  valueOfDivision: number;
+}): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y - height);
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  const scaleFactor = 10000;
+  const values = new Array(Math.floor(max / scaleFactor) + 1)
+    .fill(undefined)
+    .map((_, index) => index * scaleFactor)
+    .slice(1);
+
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "right";
+  values.forEach((mark) => {
+    const markerY = height - mark * valueOfDivision;
+    ctx.fillRect(x - 3, markerY, 3, 1);
+    ctx.fillText(`${(mark / scaleFactor).toFixed(0)} ${unit}`, x - 4, markerY);
+  });
+  ctx.font = "italic 10px sans-serif";
+  ctx.fillText(`× ${scaleFactor.toLocaleString()}`, x - 4, 4);
+
   ctx.closePath();
   ctx.restore();
 }
@@ -220,16 +311,16 @@ const ProfilePlot: FunctionComponent<Props> = ({ width, height }) => {
         <div className={styles.legendItem}>
           <span
             className={styles.marker}
-            style={{ backgroundColor: metersColor }}
+            style={{ backgroundColor: pxColor }}
           ></span>
-          <span className={styles.label}>Cell radius, m</span>
+          <span className={styles.label}>Cell radius, px</span>
         </div>
         <div className={styles.legendItem}>
           <span
             className={styles.marker}
-            style={{ backgroundColor: pxColor }}
+            style={{ backgroundColor: metersColor }}
           ></span>
-          <span className={styles.label}>Cell radius, px</span>
+          <span className={styles.label}>Cell radius, m</span>
         </div>
       </div>
     </div>
