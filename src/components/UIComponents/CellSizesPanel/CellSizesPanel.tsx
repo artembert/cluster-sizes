@@ -14,7 +14,9 @@ const CellSizesPanel: FunctionComponent = () => {
   const dispatchGrid = useGridSellSizeDispatch();
   const dispatchCellSizeChange = useCellSizeDispatch();
   const [valuesCashe, setValuesCashe] = useState({ ...cellSizes });
-  const sizes = Object.entries(valuesCashe) as [DefinedZoomLevel, number][];
+  const sizes = Object.entries(valuesCashe).sort((a, b) =>
+    +a[0] > +b[0] ? 1 : -1
+  ) as [DefinedZoomLevel, number][];
 
   function handleCellSizeChange(
     zoomLevel: DefinedZoomLevel,
@@ -56,11 +58,17 @@ const CellSizesPanel: FunctionComponent = () => {
       <table className={styles.table}>
         <tbody>
           <tr>
-            <td>
-              <strong>zoom level</strong>
+            <td className={styles.label}>
+              <strong>
+                zoom <br />
+                level
+              </strong>
             </td>
-            <td>
-              <strong>cell size, m</strong>
+            <td className={styles.label}>
+              <strong>
+                cell <br />
+                radius, m
+              </strong>
             </td>
           </tr>
           {sizes.map(([zoomLevel, size]) => (

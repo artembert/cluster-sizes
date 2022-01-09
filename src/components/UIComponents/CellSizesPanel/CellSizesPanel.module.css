@@ -4,7 +4,11 @@
 }
 
 .zoomLevel {
-  text-align: right;
+  text-align: center;
+}
+
+.label {
+  text-align: center;
 }
 
 .table {
