@@ -16,7 +16,6 @@ const bottomLabelPadding = 10;
 const bottomValuesLabelsPadding = 50;
 const firstLineIndent = 8;
 const font = "12px sans-serif";
-const valueFont = "11px sans-serif";
 
 const zoomLevels = Array.from({ length: 45 })
   .fill(undefined)
