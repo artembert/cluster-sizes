@@ -23,9 +23,6 @@ const CellSizesPanel: FunctionComponent = () => {
     e: ChangeEvent<HTMLInputElement>
   ): void {
     const value = e.target.valueAsNumber;
-    if (!value) {
-      return;
-    }
     setValuesCashe(
       produce(valuesCashe, (draft) => {
         draft[zoomLevel] = value;
@@ -35,7 +32,8 @@ const CellSizesPanel: FunctionComponent = () => {
 
   function handleCellSizeBlur(zoomLevel: DefinedZoomLevel): void {
     const value = valuesCashe[zoomLevel];
-    if (!value) {
+    if (!value || value < 100) {
+      setValuesCashe(cellSizes);
       return;
     }
     dispatchCellSizeChange({
@@ -80,7 +78,6 @@ const CellSizesPanel: FunctionComponent = () => {
                   className={styles.input}
                   onChange={(e) => handleCellSizeChange(zoomLevel, e)}
                   onBlur={() => handleCellSizeBlur(zoomLevel)}
-                  min={0}
                   value={size}
                 />
               </td>
