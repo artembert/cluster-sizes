@@ -3,10 +3,11 @@ import {
   MIN_CELL_RADIUS,
   useGridSellSize,
 } from "../../../contexts/GridCellSizeContext";
+import { pxColor } from "../../UIComponents/ProfilePlot/ProfilePlot";
 import Canvas from "../Canvas/Canvas";
 import { drawPieChart, PieChartItem } from "../PieChart/PieChart";
 
-const GRID_CELL_BORDER_COLOR = "#888888";
+const GRID_CELL_BORDER_COLOR = pxColor;
 
 /**
  * Image: https://eperezcosano.github.io/hex-grid/

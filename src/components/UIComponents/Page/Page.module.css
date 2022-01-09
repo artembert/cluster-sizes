@@ -17,6 +17,11 @@
   border-bottom: 1px solid var(--grey-400);
 }
 
+.title {
+  padding: 8px 4px 8px;
+  margin: 0;
+}
+
 .sidebar {
   grid-area: sidebar;
   border-right: 1px solid var(--grey-400);

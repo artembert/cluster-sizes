@@ -40,9 +40,7 @@ function drawPlot(
       meters: getCellSizeInMetersByZoom({ zoomLevel, lat: INITIAL_LATITUDE }),
     }),
   }));
-  const indentBetweenLines = Math.floor(
-    (width - 2 * firstLineIndent) / cellSizes.length
-  );
+  const indentBetweenLines = Math.floor(width / cellSizes.length);
   const metersMaxHeight = Math.max(...cellSizes.map((_) => _.cellSizeInMeters));
   const pxMaxHeight = Math.max(...cellSizes.map((_) => _.cellSizeInPx));
   const chartHeight = height - bottomValuesLabelsPadding - bottomLabelPadding;

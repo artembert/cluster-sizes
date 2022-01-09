@@ -10,7 +10,7 @@ export const Page: FunctionComponent = () => {
     <GridSellSizeProvider>
       <div className={styles.container}>
         <header className={styles.header}>
-          <h1>Cluster sizes</h1>
+          <h1 className={styles.title}>Cluster sizes</h1>
         </header>
         <aside className={styles.sidebar}>
           <Sidebar />
