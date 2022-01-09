@@ -75,10 +75,6 @@ function reducer(prevState: MetersCellSizes, action: Action): MetersCellSizes {
   return produce(prevState, (draft) => {
     draft[action.payload.zoomLevel] = action.payload.metersInCell;
   });
-  // return {
-  // ...prevState,
-  // [action.payload.zoomLevel]: action.payload.metersInCell,
-  // };
 }
 
 export function useCellSize() {
