@@ -167,26 +167,6 @@ function renderValueLabel({
   ctx.restore();
 }
 
-function renderValue({
-  ctx,
-  text,
-  x,
-  y,
-}: {
-  ctx: CanvasRenderingContext2D;
-  text: string;
-  x: number;
-  y: number;
-}): void {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(-Math.PI / 2);
-  ctx.textAlign = "right";
-  ctx.font = valueFont;
-  ctx.fillText(text, 0, 0);
-  ctx.restore();
-}
-
 function renderLabel(
   ctx: CanvasRenderingContext2D,
   text: string,
