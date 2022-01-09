@@ -14,25 +14,25 @@ const MapMetadata: FunctionComponent = () => {
     <table className={styles.table}>
       <tbody>
         <tr>
+          <td>zoom-level</td>
           <td>
-            <div>zoom-level</div>
             <input
               value={zoomLevel.toFixed(2)}
-              type="number"
+              type="text"
               className={styles.input}
               disabled
             />
           </td>
         </tr>
         <tr>
+          <td>cell radius</td>
           <td
             className={styles.associatedField}
             style={{ backgroundColor: pxColor }}
           >
-            <div> Cell radius</div>
             <input
-              value={cellOuterRadius.toFixed(2)}
-              type="number"
+              value={cellOuterRadius.toFixed(0)}
+              type="text"
               className={styles.input}
               min={MIN_CELL_RADIUS}
               disabled
@@ -41,13 +41,14 @@ const MapMetadata: FunctionComponent = () => {
           </td>
         </tr>
         <tr>
+          <td></td>
           <td
             className={styles.associatedField}
             style={{ backgroundColor: metersColor }}
           >
             <input
-              value={cellSizeInMeters.toFixed(2)}
-              type="number"
+              value={cellSizeInMeters.toFixed(0)}
+              type="text"
               className={styles.input}
               disabled
             />
@@ -56,10 +57,13 @@ const MapMetadata: FunctionComponent = () => {
         </tr>
         <tr>
           <td>
-            <div>max marker-radius</div>
+            max <br />
+            marker-radius
+          </td>
+          <td>
             <input
-              value={cellInnerRadius.toFixed(2)}
-              type="number"
+              value={cellInnerRadius.toFixed(0)}
+              type="text"
               className={styles.input}
               disabled
             />

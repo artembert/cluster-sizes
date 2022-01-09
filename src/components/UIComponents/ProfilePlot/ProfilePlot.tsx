@@ -292,9 +292,6 @@ const ProfilePlot: FunctionComponent<Props> = ({ width, height }) => {
         The relationship between the cell size of the hexagonal grid in meters
         and pixels at different zoom levels
       </div>
-      <div className={styles.plot}>
-        <Canvas draw={draw} width={width} height={height} />
-      </div>
       <div className={styles.legend}>
         <div className={styles.legendItem}>
           <span
@@ -310,6 +307,9 @@ const ProfilePlot: FunctionComponent<Props> = ({ width, height }) => {
           ></span>
           <span className={styles.label}>Cell radius, m</span>
         </div>
+      </div>
+      <div className={styles.plot}>
+        <Canvas draw={draw} width={width} height={height} />
       </div>
     </div>
   );
