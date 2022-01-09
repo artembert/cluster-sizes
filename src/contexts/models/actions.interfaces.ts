@@ -5,7 +5,11 @@ import { MetersCellSizes } from "../CellSizeContext";
 interface ZoomChangePayload {
   zoomLevel: number;
   lat: number;
-  sellCizes: MetersCellSizes;
+  cellSizes: MetersCellSizes;
+}
+
+interface RefreshPayload {
+  cellSizes: MetersCellSizes;
 }
 
 export interface ZoomEndAction extends BaseAction<ZoomChangePayload> {
@@ -14,5 +18,8 @@ export interface ZoomEndAction extends BaseAction<ZoomChangePayload> {
 
 export interface ZoomChangeStartAction extends BaseAction<undefined> {
   type: ActionKind.ZoomStart;
-  payload: undefined;
+}
+
+export interface RefreshAction extends BaseAction<RefreshPayload> {
+  type: ActionKind.Refresh;
 }

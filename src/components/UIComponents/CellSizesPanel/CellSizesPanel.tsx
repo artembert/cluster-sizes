@@ -1,31 +1,52 @@
-import { ChangeEvent, FunctionComponent } from "react";
+import produce from "immer";
+import { ChangeEvent, FunctionComponent, useState } from "react";
 import {
   DefinedZoomLevel,
   useCellSize,
   useCellSizeDispatch,
 } from "../../../contexts/CellSizeContext";
+import { useGridSellSizeDispatch } from "../../../contexts/GridCellSizeContext";
 import { ActionKind } from "../../../contexts/models/action-kind.constant";
 import styles from "./CellSizesPanel.module.css";
 
 const CellSizesPanel: FunctionComponent = () => {
   const cellSizes = useCellSize();
-  const dispatch = useCellSizeDispatch();
-  const sizes = Object.entries(cellSizes) as [DefinedZoomLevel, number][];
+  const dispatchGrid = useGridSellSizeDispatch();
+  const dispatchCellSizeChange = useCellSizeDispatch();
+  const [valuesCashe, setValuesCashe] = useState({ ...cellSizes });
+  const sizes = Object.entries(valuesCashe) as [DefinedZoomLevel, number][];
 
   function handleCellSizeChange(
     zoomLevel: DefinedZoomLevel,
     e: ChangeEvent<HTMLInputElement>
   ): void {
     const value = e.target.valueAsNumber;
-    console.log(value);
     if (!value) {
       return;
     }
-    dispatch({
+    setValuesCashe(
+      produce(valuesCashe, (draft) => {
+        draft[zoomLevel] = value;
+      })
+    );
+  }
+
+  function handleCellSizeBlur(zoomLevel: DefinedZoomLevel): void {
+    const value = valuesCashe[zoomLevel];
+    if (!value) {
+      return;
+    }
+    dispatchCellSizeChange({
       type: ActionKind.CellSize,
       payload: {
         zoomLevel,
         metersInCell: value,
+      },
+    });
+    dispatchGrid({
+      type: ActionKind.Refresh,
+      payload: {
+        cellSizes: valuesCashe,
       },
     });
   }
@@ -50,6 +71,8 @@ const CellSizesPanel: FunctionComponent = () => {
                   type="number"
                   className={styles.input}
                   onChange={(e) => handleCellSizeChange(zoomLevel, e)}
+                  onBlur={() => handleCellSizeBlur(zoomLevel)}
+                  min={0}
                   value={size}
                 />
               </td>
@@ -62,9 +85,3 @@ const CellSizesPanel: FunctionComponent = () => {
 };
 
 export default CellSizesPanel;
-function dispatchCellSize(arg0: {
-  type: ActionKind;
-  payload: { outerRadius: number };
-}) {
-  throw new Error("Function not implemented.");
-}

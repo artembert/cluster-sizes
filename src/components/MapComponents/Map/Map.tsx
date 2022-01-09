@@ -1,10 +1,7 @@
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { FunctionComponent, useEffect, useRef } from "react";
-import {
-  MetersCellSizes,
-  useCellSize,
-} from "../../../contexts/CellSizeContext";
+import { useCellSize } from "../../../contexts/CellSizeContext";
 import {
   INITIAL_LATITUDE,
   INITIAL_ZOOM_LEVEL,
@@ -15,7 +12,7 @@ import styles from "./Map.module.css";
 
 const Map: FunctionComponent = () => {
   const dispatch = useGridSellSizeDispatch();
-  const sellCizes = useCellSize();
+  const cellSizes = useCellSize();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map>(null as any);
   const lng = 30.32;
@@ -26,18 +23,16 @@ const Map: FunctionComponent = () => {
   function handleZoomChange({
     zoomLevel,
     lat,
-    sellCizes,
   }: {
     zoomLevel: number;
     lat: number;
-    sellCizes: MetersCellSizes;
   }): void {
     dispatch({
       type: ActionKind.ZoomEnd,
       payload: {
         lat,
         zoomLevel,
-        sellCizes,
+        cellSizes,
       },
     });
   }
@@ -61,6 +56,9 @@ const Map: FunctionComponent = () => {
       minZoom: 5,
     }) as maplibregl.Map;
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
+  });
+
+  useEffect(() => {
     map.current.on("zoomstart", () => {
       handleZoomStart();
     });
@@ -71,14 +69,12 @@ const Map: FunctionComponent = () => {
       handleZoomChange({
         zoomLevel: map.current.getZoom(),
         lat: map.current.getCenter().lat,
-        sellCizes,
       });
     });
     map.current.on("zoomend", () => {
       handleZoomChange({
         zoomLevel: map.current.getZoom(),
         lat: map.current.getCenter().lat,
-        sellCizes,
       });
     });
   });
