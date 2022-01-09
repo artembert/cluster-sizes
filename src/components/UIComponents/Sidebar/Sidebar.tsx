@@ -85,6 +85,14 @@ const Sidebar: FunctionComponent = () => {
       <div className={styles.profilePlot}>
         <ProfilePlot width={240} height={300} />
       </div>
+      <div className={styles.disclaimer}>
+        <div>
+          <strong>Disclaimer</strong>
+        </div>
+        <div>
+          <span>Clusters are randomly generated</span>
+        </div>
+      </div>
     </div>
   );
 };

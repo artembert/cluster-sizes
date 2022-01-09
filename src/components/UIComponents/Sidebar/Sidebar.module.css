@@ -13,11 +13,16 @@
 }
 
 .profilePlot {
-  margin-top: 36px;
+  margin-top: 16px;
   padding: 0 8px 0;
 }
 
 .associatedField {
   padding: 4px;
   white-space: nowrap;
+}
+
+.disclaimer {
+  margin-top: 16px;
+  padding: 0 8px;
 }
