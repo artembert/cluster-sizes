@@ -1,26 +1,15 @@
-import { ChangeEvent, FunctionComponent } from "react";
+import { FunctionComponent } from "react";
 import {
-  ActionKind,
   MIN_CELL_RADIUS,
   useGridSellSize,
-  useGridSellSizeDispatch,
 } from "../../../contexts/GridCellSizeContext";
+import CellSizesPanel from "../CellSizesPanel/CellSizesPanel";
 import ProfilePlot, { metersColor, pxColor } from "../ProfilePlot/ProfilePlot";
 import styles from "./Sidebar.module.css";
 
 const Sidebar: FunctionComponent = () => {
-  const dispatchGridCellSize = useGridSellSizeDispatch();
   const { cellOuterRadius, cellInnerRadius, zoomLevel, cellSizeInMeters } =
     useGridSellSize();
-
-  function handleCellSizeChange(e: ChangeEvent<HTMLInputElement>) {
-    dispatchGridCellSize({
-      type: ActionKind.Change,
-      payload: {
-        outerRadius: e.target.valueAsNumber,
-      },
-    });
-  }
 
   return (
     <div className={styles.layout}>
@@ -48,7 +37,7 @@ const Sidebar: FunctionComponent = () => {
                 type="number"
                 className={styles.input}
                 min={MIN_CELL_RADIUS}
-                onChange={handleCellSizeChange}
+                disabled
               />
               &nbsp;px
             </td>
@@ -82,6 +71,9 @@ const Sidebar: FunctionComponent = () => {
           </tr>
         </tbody>
       </table>
+      <div>
+        <CellSizesPanel />
+      </div>
       <div className={styles.profilePlot}>
         <ProfilePlot width={340} height={300} />
       </div>

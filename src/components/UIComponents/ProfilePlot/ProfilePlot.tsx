@@ -1,4 +1,8 @@
 import { FunctionComponent } from "react";
+import {
+  MetersCellSizes,
+  useCellSize,
+} from "../../../contexts/CellSizeContext";
 import { INITIAL_LATITUDE } from "../../../contexts/GridCellSizeContext";
 import { getCellSizeInMetersByZoom } from "../../../geo-helpers/grid-cell-size-by-zoom.helper";
 import { getPixelsFromMeters } from "../../../geo-helpers/meters-per-pixels.helper";
@@ -25,19 +29,23 @@ const zoomLevels = Array.from({ length: 45 })
 function drawPlot(
   ctx: CanvasRenderingContext2D,
   width: number,
-  height: number
+  height: number,
+  metersCellSizes: MetersCellSizes
 ): void {
   clearGrid(ctx, width, height);
   const cellSizes = zoomLevels.map((zoomLevel) => ({
     zoomLevel,
     cellSizeInMeters: getCellSizeInMetersByZoom({
       zoomLevel,
-      lat: INITIAL_LATITUDE,
+      cellSizes: metersCellSizes,
     }),
     cellSizeInPx: getPixelsFromMeters({
       lat: INITIAL_LATITUDE,
       zoomLevel,
-      meters: getCellSizeInMetersByZoom({ zoomLevel, lat: INITIAL_LATITUDE }),
+      meters: getCellSizeInMetersByZoom({
+        zoomLevel,
+        cellSizes: metersCellSizes,
+      }),
     }),
   }));
   const indentBetweenLines = Math.floor(width / cellSizes.length);
@@ -273,8 +281,9 @@ function clearGrid(
 }
 
 const ProfilePlot: FunctionComponent<Props> = ({ width, height }) => {
+  const metersCellSizes = useCellSize();
   function draw(ctx: CanvasRenderingContext2D): void {
-    return drawPlot.call(null, ctx, width, height);
+    return drawPlot.call(null, ctx, width, height, metersCellSizes);
   }
 
   return (

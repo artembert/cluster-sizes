@@ -1,0 +1,21 @@
+.input {
+  width: 80px;
+  text-align: right;
+}
+
+.zoomLevel {
+  text-align: right;
+}
+
+.table {
+  width: fit-content;
+}
+
+.table td {
+  padding: 0 4px;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
