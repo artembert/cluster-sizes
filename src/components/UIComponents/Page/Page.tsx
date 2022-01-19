@@ -19,9 +19,9 @@ export const Page: FunctionComponent = () => {
           </aside>
           <main className={styles.main}>
             <Map />
-            <div className={styles.gridContainer}>
-              <CanvasGrid width={650} height={650} />
-            </div>
+            {/*<div className={styles.gridContainer}>*/}
+            {/*  <CanvasGrid width={650} height={650} />*/}
+            {/*</div>*/}
           </main>
         </div>
       </GridSellSizeProvider>

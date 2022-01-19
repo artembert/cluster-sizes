@@ -18,8 +18,10 @@ import {
 
 export const MIN_CELL_RADIUS = 10;
 export const MAX_CELL_RADIUS = 80;
-export const INITIAL_ZOOM_LEVEL = 9.01;
-export const INITIAL_LATITUDE = 59.94;
+export const INITIAL_ZOOM_LEVEL = 10.01;
+export const INITIAL_LATITUDE = 55.760119;
+export const INITIAL_LON = 37.619073;
+export const MARKER_RADIUS = 40;
 
 export interface BaseAction<Payload extends unknown> {
   type: ActionKind;
