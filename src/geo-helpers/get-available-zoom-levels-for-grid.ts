@@ -1,5 +1,5 @@
 import { MARKER_RADIUS } from "../contexts/GridCellSizeContext";
-import { getMetersPerPixel } from "./meters-per-pixels.helper";
+import { getMetersPerPixel } from "./get-meters-per-pixel.helper";
 import { INITIAL_LATITUDE } from "../contexts/CellSizeContext";
 
 export interface LayerZoomRestrictions {
