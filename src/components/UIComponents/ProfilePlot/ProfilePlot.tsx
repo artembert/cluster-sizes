@@ -5,7 +5,7 @@ import {
 } from "../../../contexts/CellSizeContext";
 import { INITIAL_LATITUDE } from "../../../contexts/GridCellSizeContext";
 import { getCellSizeInMetersByZoom } from "../../../geo-helpers/grid-cell-size-by-zoom.helper";
-import { getPixelsFromMeters } from "../../../geo-helpers/meters-per-pixels.helper";
+import { getPixelsFromMeters } from "../../../geo-helpers/get-pixels-from.meters";
 import Canvas from "../../MapComponents/Canvas/Canvas";
 import styles from "./ProfilePlot.module.css";
 

@@ -7,7 +7,7 @@ import {
   useReducer,
 } from "react";
 import { getCellSizeInMetersByZoom } from "../geo-helpers/grid-cell-size-by-zoom.helper";
-import { getPixelsFromMeters } from "../geo-helpers/meters-per-pixels.helper";
+import { getPixelsFromMeters } from "../geo-helpers/get-pixels-from.meters";
 import { initialCellSizes } from "./CellSizeContext";
 import { ActionKind } from "./models/action-kind.constant";
 import {
