@@ -129,6 +129,18 @@ const addLayers: (
       "source-layer": id,
       paint: clusterStyleConfig,
     });
+    map.addLayer({
+      minzoom: minZoom,
+      maxzoom: maxZoom,
+      id: id + "__1",
+      type: "line",
+      source: table,
+      "source-layer": id,
+      paint: {
+        "line-color": "#999999",
+        "line-width": 2,
+      },
+    });
   });
 };
 
