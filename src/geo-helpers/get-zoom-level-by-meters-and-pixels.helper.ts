@@ -25,6 +25,7 @@ export function getZoomLevelByMetersAndPixels({
   //   (EARTH_CIRCUMFERENCE * Math.cos(latitudeRadians)) / meters;
   // 3
   return (
-    -8 + Math.log2((EARTH_CIRCUMFERENCE * Math.cos(latitudeRadians)) / meters)
+    -8 +
+    Math.log2(((EARTH_CIRCUMFERENCE * Math.cos(latitudeRadians)) / meters) * px)
   );
 }
