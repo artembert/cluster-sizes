@@ -2,31 +2,6 @@ import { MARKER_RADIUS } from "../contexts/GridCellSizeContext";
 import { getMetersPerPixel } from "./get-meters-per-pixel.helper";
 import { INITIAL_LATITUDE } from "../contexts/CellSizeContext";
 
-export interface LayerZoomRestrictions {
-  minZoom: number;
-  maxZoom: number;
-}
-
-export function getAvailableZoomLevelsForGrid(
-  clusterInternalDiameter: number
-): LayerZoomRestrictions {
-  const maxZoom = resolveZoomLevelForMakerSize(clusterInternalDiameter);
-  return {
-    minZoom: maxZoom - 1,
-    maxZoom,
-  };
-  if (clusterInternalDiameter === 25000) {
-    return {
-      maxZoom: 13,
-      minZoom: 0,
-    };
-  }
-  return {
-    maxZoom: 1,
-    minZoom: 0,
-  };
-}
-
 /***
  * @return {number: number} ZoomLevel: marker size in meters
  */
