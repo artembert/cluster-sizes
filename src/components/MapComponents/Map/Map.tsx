@@ -1,7 +1,10 @@
-import maplibregl from "maplibre-gl";
+import maplibregl, { Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { FunctionComponent, useEffect, useRef } from "react";
-import { useCellSize } from "../../../contexts/CellSizeContext";
+import {
+  MIN_MARKER_DIAMETER,
+  useCellSize,
+} from "../../../contexts/CellSizeContext";
 import {
   INITIAL_LATITUDE,
   INITIAL_LON,
@@ -11,11 +14,19 @@ import {
 import { ActionKind } from "../../../contexts/models/action-kind.constant";
 import styles from "./Map.module.css";
 import { clusterLayers, LayerMetadata } from "../../../data/layers";
-import {
-  getAvailableZoomLevelsForGrid,
-  LayerZoomRestrictions,
-} from "../../../geo-helpers/get-available-zoom-levels-for-grid";
 import { clusterStyleConfig } from "./marker-config";
+import {
+  getZoomLevelsForLayers,
+  LayerZoomRestrictions,
+} from "../../../geo-helpers/get-zoom-levels-for-layers.helper";
+import { CanvasPoint } from "../CanvasPoint/CanvasPoint";
+
+export interface ClusterFeature {
+  geometry: { type: "Point"; coordinates: [number, number] };
+  source: string;
+  sourceLayer: string;
+  properties: { id: number; num: string };
+}
 
 const Map: FunctionComponent = () => {
   const dispatch = useGridSellSizeDispatch();
@@ -55,10 +66,14 @@ const Map: FunctionComponent = () => {
     if (!map || !mapContainer || !mapContainer.current || map.current) {
       return;
     }
+    const zoomLevelsForLayers = getZoomLevelsForLayers(
+      clusterLayers.map((layer) => layer.internalDiameter)
+    );
+    console.log(zoomLevelsForLayers);
     const zoomLevelRestrictions: (LayerMetadata & LayerZoomRestrictions)[] =
       clusterLayers.map((layer) => ({
         ...layer,
-        ...getAvailableZoomLevelsForGrid(layer.internalDiameter),
+        ...zoomLevelsForLayers[layer.internalDiameter],
       }));
     map.current = new maplibregl.Map({
       container: mapContainer.current,
@@ -72,12 +87,27 @@ const Map: FunctionComponent = () => {
     map.current.on("load", function () {
       addSources(map.current, clusterLayers);
       addLayers(map.current, zoomLevelRestrictions);
+      map.current.on("sourcedata", (e) => {
+        if (!e.sourceId?.includes("stat_grid_") || !e.isSourceLoaded) {
+          return;
+        }
+        console.log("on sourcedata", e);
+        addMarkers(
+          map.current,
+          clusterLayers.map((item) => item.id)
+        );
+      });
+      // @ts-ignore
+      window["map"] = map.current;
     });
   });
 
   useEffect(() => {
     map.current.on("zoomstart", () => {
-      handleZoomStart();
+      handleZoomChange({
+        zoomLevel: map.current.getZoom(),
+        lat: map.current.getCenter().lat,
+      });
     });
     map.current.on("dragstart", () => {
       handleZoomStart();
@@ -114,6 +144,7 @@ const addSources: (map: maplibregl.Map, sources: LayerMetadata[]) => void = (
     });
   });
 };
+const existingMarkers: Record<string, Marker> = {};
 
 const addLayers: (
   map: maplibregl.Map,
@@ -123,25 +154,51 @@ const addLayers: (
     map.addLayer({
       minzoom: minZoom,
       maxzoom: maxZoom,
-      id,
+      id: id,
       type: "circle",
       source: table,
       "source-layer": id,
       paint: clusterStyleConfig,
     });
-    map.addLayer({
-      minzoom: minZoom,
-      maxzoom: maxZoom,
-      id: id + "__1",
-      type: "line",
-      source: table,
-      "source-layer": id,
-      paint: {
-        "line-color": "#999999",
-        "line-width": 2,
-      },
-    });
   });
 };
+
+const addMarkers: (
+  map: maplibregl.Map,
+  clustersLayersNames: string[]
+) => void = (map, clustersLayersNames) => {
+  const visibleFeatures = map.queryRenderedFeatures(undefined, {
+    layers: clustersLayersNames,
+  }) as any as ClusterFeature[];
+  console.log("addMarkers:start", existingMarkers);
+  console.log("addMarkers:start visibleFeatures", visibleFeatures);
+  Object.entries(existingMarkers).forEach(([key, marker]) => {
+    marker.remove();
+    delete existingMarkers[key];
+  });
+  console.log("existingMarkers before render", existingMarkers);
+
+  visibleFeatures.forEach(({ sourceLayer, geometry, properties }) => {
+    if (geometry.type !== "Point") {
+      return;
+    }
+    if (!properties.id || !properties.num) {
+      return;
+    }
+    const marker = new maplibregl.Marker({
+      element: CanvasPoint(MIN_MARKER_DIAMETER),
+    });
+    marker.setLngLat(geometry.coordinates).addTo(map);
+    existingMarkers[getUniqueId(sourceLayer, properties)] = marker;
+  });
+  console.log("existingMarkers after render", existingMarkers);
+};
+
+function getUniqueId(
+  sourceLayer: string,
+  { id, num }: { id: number; num: string }
+): string {
+  return sourceLayer + id + "-" + num;
+}
 
 export default Map;

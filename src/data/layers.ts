@@ -60,7 +60,7 @@ const cellInternalDiameterSizes: string[] = [
 
 export const clusterLayers: LayerMetadata[] = cellInternalDiameterSizes.map(
   (size) => ({
-    id: "public.stat_grid_" + size + "_0",
+    id: "public.stat_grid_" + size + "_0_center",
     table: "stat_grid_" + size + "_0",
     internalDiameter: parseInt(size, 10),
   })
