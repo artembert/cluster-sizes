@@ -1,10 +1,7 @@
 import maplibregl, { Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { FunctionComponent, useEffect, useRef } from "react";
-import {
-  MIN_MARKER_DIAMETER,
-  useCellSize,
-} from "../../../contexts/CellSizeContext";
+import { useCellSize } from "../../../contexts/CellSizeContext";
 import {
   INITIAL_LATITUDE,
   INITIAL_LON,
@@ -13,20 +10,20 @@ import {
 } from "../../../contexts/GridCellSizeContext";
 import { ActionKind } from "../../../contexts/models/action-kind.constant";
 import styles from "./Map.module.css";
-import { clusterLayers, LayerMetadata } from "../../../data/layers";
+import {
+  clusterLayers,
+  hexagonLayers,
+  LayerMetadata,
+} from "../../../data/layers";
 import { clusterStyleConfig } from "./marker-config";
 import {
   getZoomLevelsForLayers,
   LayerZoomRestrictions,
 } from "../../../geo-helpers/get-zoom-levels-for-layers.helper";
 import { CanvasPoint } from "../CanvasPoint/CanvasPoint";
-
-export interface ClusterFeature {
-  geometry: { type: "Point"; coordinates: [number, number] };
-  source: string;
-  sourceLayer: string;
-  properties: { id: number; num: string };
-}
+import { filterClusterPoints } from "./helpers/filter-empty-clusters";
+import { resolveClusterSizeInLayerRange } from "../../../geo-helpers/resolve-cluster-size-in-layer-range.helper";
+import { ClusterFeature } from "./models/cluset-feature.interface";
 
 const Map: FunctionComponent = () => {
   const dispatch = useGridSellSizeDispatch();
@@ -71,7 +68,7 @@ const Map: FunctionComponent = () => {
     );
     console.log(zoomLevelsForLayers);
     const zoomLevelRestrictions: (LayerMetadata & LayerZoomRestrictions)[] =
-      clusterLayers.map((layer) => ({
+      hexagonLayers.map((layer) => ({
         ...layer,
         ...zoomLevelsForLayers[layer.internalDiameter],
       }));
@@ -86,7 +83,14 @@ const Map: FunctionComponent = () => {
 
     map.current.on("load", function () {
       addSources(map.current, clusterLayers);
+      addSources(map.current, hexagonLayers);
       addLayers(map.current, zoomLevelRestrictions);
+
+      /*
+       * TODO: Нужно использовать другое событие, например, zoom-*,
+       * потому что событие 'sourcedata' не всплывает происхожит при отдалении
+       * карты
+       */
       map.current.on("sourcedata", (e) => {
         if (!e.sourceId?.includes("stat_grid_") || !e.isSourceLoaded) {
           return;
@@ -155,9 +159,20 @@ const addLayers: (
       minzoom: minZoom,
       maxzoom: maxZoom,
       id: id,
-      type: "circle",
+      type: "line",
       source: table,
       "source-layer": id,
+      paint: {
+        "line-color": "#999999",
+      },
+    });
+    map.addLayer({
+      minzoom: minZoom,
+      maxzoom: maxZoom,
+      id: id + "_center",
+      type: "circle",
+      source: table + "_center",
+      "source-layer": id + "_center",
       paint: clusterStyleConfig,
     });
   });
@@ -170,6 +185,13 @@ const addMarkers: (
   const visibleFeatures = map.queryRenderedFeatures(undefined, {
     layers: clustersLayersNames,
   }) as any as ClusterFeature[];
+
+  console.log(new Set(clustersLayersNames));
+
+  /***
+   * TODO: нужно загрузить кластеры из слоя, который в данный момент разрешен зумлевелами
+   */
+  // const visibleFeatures = map.querySourceFeatures(layerId);
   console.log("addMarkers:start", existingMarkers);
   console.log("addMarkers:start visibleFeatures", visibleFeatures);
   Object.entries(existingMarkers).forEach(([key, marker]) => {
@@ -178,15 +200,21 @@ const addMarkers: (
   });
   console.log("existingMarkers before render", existingMarkers);
 
-  visibleFeatures.forEach(({ sourceLayer, geometry, properties }) => {
-    if (geometry.type !== "Point") {
-      return;
-    }
-    if (!properties.id || !properties.num) {
-      return;
-    }
+  const visiblePoints = filterClusterPoints(visibleFeatures);
+  const [minCount, maxCount] = [
+    Math.min(...visiblePoints.map((item) => parseInt(item.properties.num, 10))),
+    Math.max(...visiblePoints.map((item) => parseInt(item.properties.num, 10))),
+  ];
+
+  visiblePoints.forEach(({ sourceLayer, geometry, properties }) => {
     const marker = new maplibregl.Marker({
-      element: CanvasPoint(MIN_MARKER_DIAMETER),
+      element: CanvasPoint(
+        resolveClusterSizeInLayerRange(
+          parseInt(properties.num, 10),
+          minCount,
+          maxCount
+        )
+      ),
     });
     marker.setLngLat(geometry.coordinates).addTo(map);
     existingMarkers[getUniqueId(sourceLayer, properties)] = marker;

@@ -2,7 +2,7 @@ import { getZoomLevelByMetersAndPixels } from "./get-zoom-level-by-meters-and-pi
 import {
   INITIAL_LATITUDE,
   MAX_ZOOM_LEVEL,
-  MIN_MARKER_DIAMETER,
+  MAX_MARKER_DIAMETER,
 } from "../contexts/CellSizeContext";
 
 export interface LayerZoomRestrictions {
@@ -22,7 +22,7 @@ export function getZoomLevelsForLayers(
     collection.set(diameter, {
       minZoom: getZoomLevelByMetersAndPixels({
         meters: diameter,
-        px: MIN_MARKER_DIAMETER,
+        px: MAX_MARKER_DIAMETER,
         lat: INITIAL_LATITUDE,
       }),
       maxZoom: MAX_ZOOM_LEVEL,

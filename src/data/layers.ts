@@ -58,10 +58,18 @@ const cellInternalDiameterSizes: string[] = [
   "32000",
 ];
 
+export const hexagonLayers: LayerMetadata[] = cellInternalDiameterSizes.map(
+  (size) => ({
+    id: "public.stat_grid_" + size + "_0",
+    table: "stat_grid_" + size + "_0",
+    internalDiameter: parseInt(size, 10),
+  })
+);
+
 export const clusterLayers: LayerMetadata[] = cellInternalDiameterSizes.map(
   (size) => ({
     id: "public.stat_grid_" + size + "_0_center",
-    table: "stat_grid_" + size + "_0",
+    table: "stat_grid_" + size + "_0_center",
     internalDiameter: parseInt(size, 10),
   })
 );
