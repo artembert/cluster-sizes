@@ -113,15 +113,6 @@ const Map: FunctionComponent = () => {
         lat: map.current.getCenter().lat,
       });
     });
-    map.current.on("dragstart", () => {
-      handleZoomStart();
-    });
-    map.current.on("dragend", () => {
-      handleZoomChange({
-        zoomLevel: map.current.getZoom(),
-        lat: map.current.getCenter().lat,
-      });
-    });
     map.current.on("zoomend", () => {
       handleZoomChange({
         zoomLevel: map.current.getZoom(),
