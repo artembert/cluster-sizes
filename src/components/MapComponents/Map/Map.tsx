@@ -35,7 +35,7 @@ const Map: FunctionComponent = () => {
   const zoom = INITIAL_ZOOM_LEVEL;
   const API_KEY = "WG5WfHW7QZ4Jd8QZ6hkg";
 
-  function handleZoomChange({
+  function handleZoomEnd({
     zoomLevel,
     lat,
   }: {
@@ -108,13 +108,10 @@ const Map: FunctionComponent = () => {
 
   useEffect(() => {
     map.current.on("zoomstart", () => {
-      handleZoomChange({
-        zoomLevel: map.current.getZoom(),
-        lat: map.current.getCenter().lat,
-      });
+      handleZoomStart();
     });
     map.current.on("zoomend", () => {
-      handleZoomChange({
+      handleZoomEnd({
         zoomLevel: map.current.getZoom(),
         lat: map.current.getCenter().lat,
       });
