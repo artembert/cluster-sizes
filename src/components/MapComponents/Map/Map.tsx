@@ -25,7 +25,7 @@ import { CanvasPoint } from "../CanvasPoint/CanvasPoint";
 import { filterClusterPoints } from "./helpers/filter-empty-clusters";
 import { resolveClusterSizeInLayerRange } from "../../../geo-helpers/resolve-cluster-size-in-layer-range.helper";
 import { ClusterFeature } from "./models/cluset-feature.interface";
-import { fromEvent, merge, throttle, timer } from "rxjs";
+import { filter, fromEvent, merge, take, throttle, timer } from "rxjs";
 import { getVisibleLayerForGivenZoomLevel } from "../../../geo-helpers/get-visible-layer-for-given-zoom-level";
 
 const existingMarkers: Record<string, Marker> = {};
@@ -113,12 +113,16 @@ const Map: FunctionComponent = () => {
       addClusterLayers(map.current, clusterLayers);
       addHexagonLayers(map.current, hexagonLayers);
 
-      map.current.on("sourcedata", (e) => {
-        if (!e.sourceId?.includes("stat_grid_") || !e.isSourceLoaded) {
-          return;
-        }
-        updateMarkers();
-      });
+      fromEvent(map.current, "sourcedata")
+        .pipe(
+          filter(
+            (e) => !(!e.sourceId?.includes("stat_grid_") || !e.isSourceLoaded)
+          ),
+          take(1)
+        )
+        .subscribe(() => {
+          updateMarkers();
+        });
       // @ts-ignore
       window["map"] = map.current;
     });
