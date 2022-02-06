@@ -12,8 +12,6 @@ export function getVisibleLayerForGivenZoomLevel(
   clusterLayers: SourceMetadata[],
   zoomLevel: number
 ): SourceMetadata | null {
-  // console.log(zoomLevel, clusterSizesZoomLevelsDictionary);
-
   let desiredClusterSize: string = "";
   const arr = Object.entries(clusterSizesZoomLevelsDictionary);
   for (let i = 0; i < arr.length; i++) {
@@ -27,7 +25,6 @@ export function getVisibleLayerForGivenZoomLevel(
       break;
     }
   }
-  console.log(zoomLevel, desiredClusterSize);
   if (desiredClusterSize) {
     return getClusterSourceByClusterDiameter(desiredClusterSize);
   }
