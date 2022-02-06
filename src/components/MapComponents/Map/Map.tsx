@@ -113,13 +113,11 @@ const Map: FunctionComponent = () => {
       addClusterLayers(map.current, clusterLayers);
       addHexagonLayers(map.current, hexagonLayers);
 
-      /*
-       * TODO: Отрендерить кластеры при первой загрузке карты
-       */
       map.current.on("sourcedata", (e) => {
         if (!e.sourceId?.includes("stat_grid_") || !e.isSourceLoaded) {
           return;
         }
+        updateMarkers();
       });
       // @ts-ignore
       window["map"] = map.current;
@@ -242,7 +240,6 @@ function getUniqueId(
   sourceLayer: string,
   { id, num }: { id: number; num: string }
 ): string {
-  console.log(sourceLayer, id, num);
   return sourceLayer + id + "-" + num;
 }
 
