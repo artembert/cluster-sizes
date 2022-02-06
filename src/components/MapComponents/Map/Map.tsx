@@ -72,13 +72,6 @@ const Map: FunctionComponent = () => {
     });
   }
 
-  function handleZoomStart(): void {
-    dispatch({
-      type: ActionKind.ZoomStart,
-      payload: undefined,
-    });
-  }
-
   function updateMarkers(): void {
     const visibleLayer = getVisibleLayerForGivenZoomLevel(
       zoomLevelsForLayers,
@@ -130,7 +123,7 @@ const Map: FunctionComponent = () => {
 
   useEffect(() => {
     const zoom$ = fromEvent(map.current, "zoom").pipe(
-      throttle(() => timer(300))
+      throttle(() => timer(200))
     );
     const zoomEnd$ = fromEvent(map.current, "zoomend");
 
