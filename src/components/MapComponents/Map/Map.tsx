@@ -11,12 +11,13 @@ import {
 import { ActionKind } from "../../../contexts/models/action-kind.constant";
 import styles from "./Map.module.css";
 import {
-  clusterLayers,
-  hexagonLayers,
-  LayerMetadata,
-} from "../../../data/layers";
+  clusterSources,
+  hexagonSources,
+  SourceMetadata,
+} from "../../../data/sources";
 import { clusterStyleConfig } from "./marker-config";
 import {
+  ClusterSizesZoomLevelsDictionary,
   getZoomLevelsForLayers,
   LayerZoomRestrictions,
 } from "../../../geo-helpers/get-zoom-levels-for-layers.helper";
@@ -24,6 +25,10 @@ import { CanvasPoint } from "../CanvasPoint/CanvasPoint";
 import { filterClusterPoints } from "./helpers/filter-empty-clusters";
 import { resolveClusterSizeInLayerRange } from "../../../geo-helpers/resolve-cluster-size-in-layer-range.helper";
 import { ClusterFeature } from "./models/cluset-feature.interface";
+import { fromEvent, merge, throttle, timer } from "rxjs";
+import { getVisibleLayerForGivenZoomLevel } from "../../../geo-helpers/get-visible-layer-for-given-zoom-level";
+
+const existingMarkers: Record<string, Marker> = {};
 
 const Map: FunctionComponent = () => {
   const dispatch = useGridSellSizeDispatch();
@@ -34,6 +39,21 @@ const Map: FunctionComponent = () => {
   const lat = INITIAL_LATITUDE;
   const zoom = INITIAL_ZOOM_LEVEL;
   const API_KEY = "WG5WfHW7QZ4Jd8QZ6hkg";
+
+  const zoomLevelsForLayers: ClusterSizesZoomLevelsDictionary =
+    getZoomLevelsForLayers(
+      clusterSources.map((layer) => layer.internalDiameter)
+    );
+  const clusterLayers: (SourceMetadata & LayerZoomRestrictions)[] =
+    clusterSources.map((layer) => ({
+      ...layer,
+      ...zoomLevelsForLayers[layer.internalDiameter],
+    }));
+  const hexagonLayers: (SourceMetadata & LayerZoomRestrictions)[] =
+    hexagonSources.map((layer) => ({
+      ...layer,
+      ...zoomLevelsForLayers[layer.internalDiameter],
+    }));
 
   function handleZoomEnd({
     zoomLevel,
@@ -59,19 +79,25 @@ const Map: FunctionComponent = () => {
     });
   }
 
+  function updateMarkers(): void {
+    const visibleLayer = getVisibleLayerForGivenZoomLevel(
+      zoomLevelsForLayers,
+      clusterSources,
+      map.current.getZoom()
+    );
+    if (visibleLayer) {
+      addMarkers(
+        map.current,
+        clusterSources.map((item) => item.id),
+        visibleLayer
+      );
+    }
+  }
+
   useEffect(() => {
     if (!map || !mapContainer || !mapContainer.current || map.current) {
       return;
     }
-    const zoomLevelsForLayers = getZoomLevelsForLayers(
-      clusterLayers.map((layer) => layer.internalDiameter)
-    );
-    console.log(zoomLevelsForLayers);
-    const zoomLevelRestrictions: (LayerMetadata & LayerZoomRestrictions)[] =
-      hexagonLayers.map((layer) => ({
-        ...layer,
-        ...zoomLevelsForLayers[layer.internalDiameter],
-      }));
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: `https://api.maptiler.com/maps/streets/style.json?key=${API_KEY}`,
@@ -81,25 +107,19 @@ const Map: FunctionComponent = () => {
     }) as maplibregl.Map;
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
-    map.current.on("load", function () {
-      addSources(map.current, clusterLayers);
-      addSources(map.current, hexagonLayers);
-      addLayers(map.current, zoomLevelRestrictions);
+    map.current.on("load", () => {
+      addSources(map.current, clusterSources);
+      addSources(map.current, hexagonSources);
+      addClusterLayers(map.current, clusterLayers);
+      addHexagonLayers(map.current, hexagonLayers);
 
       /*
-       * TODO: Нужно использовать другое событие, например, zoom-*,
-       * потому что событие 'sourcedata' не всплывает происхожит при отдалении
-       * карты
+       * TODO: Отрендерить кластеры при первой загрузке карты
        */
       map.current.on("sourcedata", (e) => {
         if (!e.sourceId?.includes("stat_grid_") || !e.isSourceLoaded) {
           return;
         }
-        console.log("on sourcedata", e);
-        addMarkers(
-          map.current,
-          clusterLayers.map((item) => item.id)
-        );
       });
       // @ts-ignore
       window["map"] = map.current;
@@ -107,8 +127,13 @@ const Map: FunctionComponent = () => {
   });
 
   useEffect(() => {
-    map.current.on("zoomstart", () => {
-      handleZoomStart();
+    const zoom$ = fromEvent(map.current, "zoom").pipe(
+      throttle(() => timer(300))
+    );
+    const zoomEnd$ = fromEvent(map.current, "zoomend");
+
+    merge(zoom$, zoomEnd$).subscribe(() => {
+      updateMarkers();
     });
     map.current.on("zoomend", () => {
       handleZoomEnd({
@@ -125,7 +150,7 @@ const Map: FunctionComponent = () => {
   );
 };
 
-const addSources: (map: maplibregl.Map, sources: LayerMetadata[]) => void = (
+const addSources: (map: maplibregl.Map, sources: SourceMetadata[]) => void = (
   map,
   sources
 ) => {
@@ -136,12 +161,28 @@ const addSources: (map: maplibregl.Map, sources: LayerMetadata[]) => void = (
     });
   });
 };
-const existingMarkers: Record<string, Marker> = {};
 
-const addLayers: (
+function addClusterLayers(
   map: maplibregl.Map,
-  sources: (LayerMetadata & LayerZoomRestrictions)[]
-) => void = (map, sources) => {
+  sources: (SourceMetadata & LayerZoomRestrictions)[]
+): void {
+  sources.forEach(({ id, table, minZoom, maxZoom }) => {
+    map.addLayer({
+      minzoom: minZoom,
+      maxzoom: maxZoom,
+      id: id,
+      type: "circle",
+      source: table,
+      "source-layer": id,
+      paint: clusterStyleConfig,
+    });
+  });
+}
+
+function addHexagonLayers(
+  map: maplibregl.Map,
+  sources: (SourceMetadata & LayerZoomRestrictions)[]
+): void {
   sources.forEach(({ id, table, minZoom, maxZoom }) => {
     map.addLayer({
       minzoom: minZoom,
@@ -154,39 +195,27 @@ const addLayers: (
         "line-color": "#999999",
       },
     });
-    map.addLayer({
-      minzoom: minZoom,
-      maxzoom: maxZoom,
-      id: id + "_center",
-      type: "circle",
-      source: table + "_center",
-      "source-layer": id + "_center",
-      paint: clusterStyleConfig,
-    });
   });
-};
+}
 
 const addMarkers: (
   map: maplibregl.Map,
-  clustersLayersNames: string[]
-) => void = (map, clustersLayersNames) => {
-  const visibleFeatures = map.queryRenderedFeatures(undefined, {
-    layers: clustersLayersNames,
+  clustersLayersNames: string[],
+  layer: SourceMetadata
+) => void = (map, clustersLayersNames, layer) => {
+  // const renderedFeatures = map.queryRenderedFeatures(undefined, {
+  //   layers: clustersLayersNames,
+  // }) as any as ClusterFeature[];
+  // console.log(renderedFeatures);
+
+  const visibleFeatures = map.querySourceFeatures(layer.table, {
+    sourceLayer: layer.id,
   }) as any as ClusterFeature[];
 
-  console.log(new Set(clustersLayersNames));
-
-  /***
-   * TODO: нужно загрузить кластеры из слоя, который в данный момент разрешен зумлевелами
-   */
-  // const visibleFeatures = map.querySourceFeatures(layerId);
-  console.log("addMarkers:start", existingMarkers);
-  console.log("addMarkers:start visibleFeatures", visibleFeatures);
   Object.entries(existingMarkers).forEach(([key, marker]) => {
     marker.remove();
     delete existingMarkers[key];
   });
-  console.log("existingMarkers before render", existingMarkers);
 
   const visiblePoints = filterClusterPoints(visibleFeatures);
   const [minCount, maxCount] = [
@@ -194,7 +223,7 @@ const addMarkers: (
     Math.max(...visiblePoints.map((item) => parseInt(item.properties.num, 10))),
   ];
 
-  visiblePoints.forEach(({ sourceLayer, geometry, properties }) => {
+  visiblePoints.forEach(({ geometry, properties }) => {
     const marker = new maplibregl.Marker({
       element: CanvasPoint(
         resolveClusterSizeInLayerRange(
@@ -205,15 +234,15 @@ const addMarkers: (
       ),
     });
     marker.setLngLat(geometry.coordinates).addTo(map);
-    existingMarkers[getUniqueId(sourceLayer, properties)] = marker;
+    existingMarkers[getUniqueId(layer.id, properties)] = marker;
   });
-  console.log("existingMarkers after render", existingMarkers);
 };
 
 function getUniqueId(
   sourceLayer: string,
   { id, num }: { id: number; num: string }
 ): string {
+  console.log(sourceLayer, id, num);
   return sourceLayer + id + "-" + num;
 }
 

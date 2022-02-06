@@ -10,9 +10,14 @@ export interface LayerZoomRestrictions {
   maxZoom: number;
 }
 
+export type ClusterSizesZoomLevelsDictionary = Record<
+  number,
+  LayerZoomRestrictions
+>;
+
 export function getZoomLevelsForLayers(
   clusterInternalDiameters: number[]
-): Record<number, LayerZoomRestrictions> {
+): ClusterSizesZoomLevelsDictionary {
   const collection: Map<number, LayerZoomRestrictions> = new Map<
     number,
     LayerZoomRestrictions
