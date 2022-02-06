@@ -12,6 +12,9 @@ export const MIN_CELL_RADIUS = 10;
 export const MAX_CELL_RADIUS = 80;
 export const INITIAL_ZOOM_LEVEL = 9;
 export const INITIAL_LATITUDE = 59.94;
+export const MAX_ZOOM_LEVEL = 22;
+export const MAX_MARKER_DIAMETER = 80;
+export const MIN_MARKER_DIAMETER = 50;
 
 interface Action {
   type: ActionKind.CellSize;

@@ -1,0 +1,1 @@
+export const EARTH_CIRCUMFERENCE = 40075016.686;

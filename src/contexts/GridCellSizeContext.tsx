@@ -7,7 +7,7 @@ import {
   useReducer,
 } from "react";
 import { getCellSizeInMetersByZoom } from "../geo-helpers/grid-cell-size-by-zoom.helper";
-import { getPixelsFromMeters } from "../geo-helpers/meters-per-pixels.helper";
+import { getPixelsFromMeters } from "../geo-helpers/get-pixels-from.meters";
 import { initialCellSizes } from "./CellSizeContext";
 import { ActionKind } from "./models/action-kind.constant";
 import {
@@ -18,8 +18,10 @@ import {
 
 export const MIN_CELL_RADIUS = 10;
 export const MAX_CELL_RADIUS = 80;
-export const INITIAL_ZOOM_LEVEL = 9.01;
-export const INITIAL_LATITUDE = 59.94;
+export const INITIAL_ZOOM_LEVEL = 7.9;
+export const INITIAL_LATITUDE = 55.760119;
+export const INITIAL_LON = 37.619073;
+export const MARKER_RADIUS = 40;
 
 export interface BaseAction<Payload extends unknown> {
   type: ActionKind;
