@@ -80,8 +80,8 @@ export function getClusterSourceByClusterDiameter(
   clusterDiameter: string
 ): SourceMetadata {
   return {
-    id: "public.stat_grid_" + clusterDiameter + "_0_center",
-    table: "stat_grid_" + clusterDiameter + "_0_center",
+    id: "public.stat_grid_" + clusterDiameter + "_0_centroid",
+    table: "stat_grid_" + clusterDiameter + "_0_centroid",
     internalDiameter: parseInt(clusterDiameter, 10),
   };
 }

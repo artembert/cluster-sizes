@@ -27,6 +27,7 @@ import { resolveClusterSizeInLayerRange } from "../../../geo-helpers/resolve-clu
 import { ClusterFeature } from "./models/cluset-feature.interface";
 import { filter, fromEvent, merge, take, throttle, timer } from "rxjs";
 import { getVisibleLayerForGivenZoomLevel } from "../../../geo-helpers/get-visible-layer-for-given-zoom-level";
+import { preparePieChartData } from "./helpers/prepare-pie-chart-data.helper";
 
 const existingMarkers: Record<string, Marker> = {};
 
@@ -187,7 +188,7 @@ function addHexagonLayers(
       source: table,
       "source-layer": id,
       paint: {
-        "line-color": "#999999",
+        "line-color": "transparent",
       },
     });
   });
@@ -221,6 +222,7 @@ const addMarkers: (
   visiblePoints.forEach(({ geometry, properties }) => {
     const marker = new maplibregl.Marker({
       element: CanvasPoint(
+        preparePieChartData(properties),
         resolveClusterSizeInLayerRange(
           parseInt(properties.num, 10),
           minCount,
