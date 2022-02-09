@@ -13,6 +13,8 @@ import styles from "./Map.module.css";
 import {
   clusterSources,
   hexagonSources,
+  ClustersSourceMetadata,
+  pointsSource,
   SourceMetadata,
 } from "../../../data/sources";
 import { clusterStyleConfig } from "./marker-config";
@@ -45,12 +47,12 @@ const Map: FunctionComponent = () => {
     getZoomLevelsForLayers(
       clusterSources.map((layer) => layer.internalDiameter)
     );
-  const clusterLayers: (SourceMetadata & LayerZoomRestrictions)[] =
+  const clusterLayers: (ClustersSourceMetadata & LayerZoomRestrictions)[] =
     clusterSources.map((layer) => ({
       ...layer,
       ...zoomLevelsForLayers[layer.internalDiameter],
     }));
-  const hexagonLayers: (SourceMetadata & LayerZoomRestrictions)[] =
+  const hexagonLayers: (ClustersSourceMetadata & LayerZoomRestrictions)[] =
     hexagonSources.map((layer) => ({
       ...layer,
       ...zoomLevelsForLayers[layer.internalDiameter],
@@ -79,6 +81,7 @@ const Map: FunctionComponent = () => {
       clusterSources,
       map.current.getZoom()
     );
+    clearMarkers();
     if (visibleLayer) {
       addMarkers(
         map.current,
@@ -104,8 +107,10 @@ const Map: FunctionComponent = () => {
     map.current.on("load", () => {
       addSources(map.current, clusterSources);
       addSources(map.current, hexagonSources);
+      addSources(map.current, [pointsSource]);
       addClusterLayers(map.current, clusterLayers);
       addHexagonLayers(map.current, hexagonLayers);
+      addPointsLayer(map.current, [pointsSource]);
 
       fromEvent(map.current, "sourcedata")
         .pipe(
@@ -160,7 +165,7 @@ const addSources: (map: maplibregl.Map, sources: SourceMetadata[]) => void = (
 
 function addClusterLayers(
   map: maplibregl.Map,
-  sources: (SourceMetadata & LayerZoomRestrictions)[]
+  sources: (ClustersSourceMetadata & LayerZoomRestrictions)[]
 ): void {
   sources.forEach(({ id, table, minZoom, maxZoom }) => {
     map.addLayer({
@@ -177,7 +182,7 @@ function addClusterLayers(
 
 function addHexagonLayers(
   map: maplibregl.Map,
-  sources: (SourceMetadata & LayerZoomRestrictions)[]
+  sources: (ClustersSourceMetadata & LayerZoomRestrictions)[]
 ): void {
   sources.forEach(({ id, table, minZoom, maxZoom }) => {
     map.addLayer({
@@ -194,10 +199,34 @@ function addHexagonLayers(
   });
 }
 
+function addPointsLayer(
+  map: maplibregl.Map,
+  sources: (SourceMetadata & LayerZoomRestrictions)[]
+): void {
+  sources.forEach(({ id, table, minZoom, maxZoom }) => {
+    map.addLayer({
+      minzoom: minZoom,
+      maxzoom: maxZoom,
+      id: id,
+      type: "circle",
+      source: table,
+      "source-layer": id,
+      paint: {},
+    });
+  });
+}
+
+function clearMarkers(): void {
+  Object.entries(existingMarkers).forEach(([key, marker]) => {
+    marker.remove();
+    delete existingMarkers[key];
+  });
+}
+
 const addMarkers: (
   map: maplibregl.Map,
   clustersLayersNames: string[],
-  layer: SourceMetadata
+  layer: ClustersSourceMetadata
 ) => void = (map, clustersLayersNames, layer) => {
   // const renderedFeatures = map.queryRenderedFeatures(undefined, {
   //   layers: clustersLayersNames,
@@ -207,11 +236,6 @@ const addMarkers: (
   const visibleFeatures = map.querySourceFeatures(layer.table, {
     sourceLayer: layer.id,
   }) as any as ClusterFeature[];
-
-  Object.entries(existingMarkers).forEach(([key, marker]) => {
-    marker.remove();
-    delete existingMarkers[key];
-  });
 
   const visiblePoints = filterClusterPoints(visibleFeatures);
   const [minCount, maxCount] = [

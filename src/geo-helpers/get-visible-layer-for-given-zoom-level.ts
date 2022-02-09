@@ -4,14 +4,14 @@ import {
 } from "./get-zoom-levels-for-layers.helper";
 import {
   getClusterSourceByClusterDiameter,
-  SourceMetadata,
+  ClustersSourceMetadata,
 } from "../data/sources";
 
 export function getVisibleLayerForGivenZoomLevel(
   clusterSizesZoomLevelsDictionary: ClusterSizesZoomLevelsDictionary,
-  clusterLayers: SourceMetadata[],
+  clusterLayers: ClustersSourceMetadata[],
   zoomLevel: number
-): SourceMetadata | null {
+): ClustersSourceMetadata | null {
   let desiredClusterSize: string = "";
   const arr = Object.entries(clusterSizesZoomLevelsDictionary);
   for (let i = 0; i < arr.length; i++) {

@@ -1,6 +1,12 @@
+import { LayerZoomRestrictions } from "../geo-helpers/get-zoom-levels-for-layers.helper";
+import { MAX_CLUSTER_ZOOM_LEVEL } from "../contexts/CellSizeContext";
+
 export interface SourceMetadata {
   id: string;
   table: string;
+}
+
+export interface ClustersSourceMetadata extends SourceMetadata {
   internalDiameter: number;
 }
 
@@ -58,17 +64,19 @@ const cellInternalDiameterSizes: string[] = [
   "32000",
 ];
 
-export const hexagonSources: SourceMetadata[] = cellInternalDiameterSizes.map(
-  (size) => getHexagonSourceByClusterDiameter(size)
-);
+export const hexagonSources: ClustersSourceMetadata[] =
+  cellInternalDiameterSizes.map((size) =>
+    getHexagonSourceByClusterDiameter(size)
+  );
 
-export const clusterSources: SourceMetadata[] = cellInternalDiameterSizes.map(
-  (size) => getClusterSourceByClusterDiameter(size)
-);
+export const clusterSources: ClustersSourceMetadata[] =
+  cellInternalDiameterSizes.map((size) =>
+    getClusterSourceByClusterDiameter(size)
+  );
 
 function getHexagonSourceByClusterDiameter(
   clusterDiameter: string
-): SourceMetadata {
+): ClustersSourceMetadata {
   return {
     id: "public.stat_grid_" + clusterDiameter + "_0",
     table: "stat_grid_" + clusterDiameter + "_0",
@@ -78,10 +86,17 @@ function getHexagonSourceByClusterDiameter(
 
 export function getClusterSourceByClusterDiameter(
   clusterDiameter: string
-): SourceMetadata {
+): ClustersSourceMetadata {
   return {
     id: "public.stat_grid_" + clusterDiameter + "_0_centroid",
     table: "stat_grid_" + clusterDiameter + "_0_centroid",
     internalDiameter: parseInt(clusterDiameter, 10),
   };
 }
+
+export const pointsSource: SourceMetadata & LayerZoomRestrictions = {
+  id: "public.izi_waste_random",
+  table: "izi_waste_random",
+  minZoom: MAX_CLUSTER_ZOOM_LEVEL,
+  maxZoom: 22,
+};

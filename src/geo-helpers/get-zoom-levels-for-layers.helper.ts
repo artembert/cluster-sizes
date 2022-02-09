@@ -1,7 +1,7 @@
 import { getZoomLevelByMetersAndPixels } from "./get-zoom-level-by-meters-and-pixels.helper";
 import {
   INITIAL_LATITUDE,
-  MAX_ZOOM_LEVEL,
+  MAX_CLUSTER_ZOOM_LEVEL,
   MAX_MARKER_DIAMETER,
 } from "../contexts/CellSizeContext";
 
@@ -30,7 +30,7 @@ export function getZoomLevelsForLayers(
         px: MAX_MARKER_DIAMETER,
         lat: INITIAL_LATITUDE,
       }),
-      maxZoom: MAX_ZOOM_LEVEL,
+      maxZoom: MAX_CLUSTER_ZOOM_LEVEL,
       // minZoom: 0,
       // maxZoom: getZoomLevelByMetersAndPixels({
       //   meters: diameter,
